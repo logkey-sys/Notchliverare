@@ -148,8 +148,8 @@
   <section id="mint">
     <h2>Mint <em>steps.</em></h2>
     <div class="bar"><i></i></div>
-    <p id="supplyLine" style="color:var(--mut);font-size:13px;line-height:1.7">Loading remaining supply...</p>
-    <p class="secsub">Mint not open yet &mdash; 0 of 11,111. Pick a phase, set your amount, and confirm in your wallet when mint opens. Nothing here mints or charges yet. Contract deployed and verified on BNB Mainnet 56: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. Mint stays closed until the owner signs setMintEnabled(true).</p>
+    <p id="supplyLine" onclick="loadSupply()" style="cursor:pointer;color:var(--mut);font-size:13px;line-height:1.7">Loading remaining supply...</p>
+    <p class="secsub" id="mintIntro">Mint not open yet &mdash; 0 of 11,111. Pick a phase, set your amount, and confirm in your wallet when mint opens. Nothing here mints or charges yet. Contract deployed and verified on BNB Mainnet 56: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. Mint stays closed until the owner signs setMintEnabled(true).</p>
     <div class="steps">
       <div class="step"><h3>STEP 1</h3><p>Click Connect Wallet and approve the connection in your wallet (OKX, MetaMask, or any other EVM wallet) on the BNB Chain network. Wallets holding a Binance Agent ID work too &mdash; this page detects it after you connect.</p></div>
       <div class="step"><h3>STEP 2</h3><p>Pick how you mint, from the same full pool: Free Mint (0.0001 BNB fee) or Paid Mint (0.001 BNB per NFT), then set the mint amount. No tokens are reserved for one phase or the other.</p></div>
@@ -166,10 +166,10 @@
       <p id="total" style="color:var(--mut);font-size:13px;line-height:1.7">Total: 1 &times; 0.0001 BNB = 0.0001 BNB, plus BNB Chain gas.</p>
       <button class="mintbtn" id="mintBtn" onclick="handleMint()">Connect Wallet to Mint</button>
       <p id="mintStatus" style="color:var(--mut);font-size:13px;line-height:1.7">Wallet not connected. Mint is currently closed until the owner signs setMintEnabled(true).</p>
-      <div class="warn"><b>Mint not open yet.</b> Contract address (verified on BNB Mainnet 56): 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. No separate payout address is shown in this mint page or in the AI Agent prompts. The mint button stays disabled until the owner signs setMintEnabled(true).</div>
+      <div class="warn" id="mintWarn"><b>Mint not open yet.</b> Contract address (verified on BNB Mainnet 56): 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. No separate payout address is shown in this mint page or in the AI Agent prompts. The mint button stays disabled until the owner signs setMintEnabled(true).</div>
     </div>
     <div class="stats">
-      <div class="stat"><span>Status</span><b>Live</b><small>Contract deployed, mint closed</small></div>
+      <div class="stat"><span>Status</span><b>Live</b><small id="statusNote">Contract deployed, mint closed</small></div>
       <div class="stat"><span>Supply</span><b>11,111</b></div>
       <div class="stat"><span>Tiers</span><b>6</b><small>Common to Mythic</small></div>
       <div class="stat"><span>Chain</span><b>BNB</b><small>BNB Smart Chain &middot; 56 &middot; OKX wallet first</small></div>
@@ -251,21 +251,29 @@ async function checkMintStatus() {
 
 function updateSupplyUI(minted, enabled) {
   var bar = document.querySelector('.bar i'); if (bar) bar.style.width = (Number(minted) / 11111 * 100).toFixed(2) + '%';
-  var el = document.getElementById('supplyLine'); if (!el) return;
-  var remaining = 11111 - Number(minted);
-  el.textContent = 'Minted: ' + minted.toString() + ' / 11,111 · Remaining: ' + remaining.toLocaleString('en-US') + (enabled ? ' · Mint is OPEN' : ' · Mint is closed');
+  var el = document.getElementById('supplyLine'); if (el) {
+    var remaining = 11111 - Number(minted);
+    el.textContent = 'Minted: ' + minted.toString() + ' / 11,111 · Remaining: ' + remaining.toLocaleString('en-US') + (enabled ? ' · Mint is OPEN' : ' · Mint is closed');
+  }
+  var intro = document.getElementById('mintIntro'); if (intro && enabled) intro.textContent = 'Mint is OPEN — ' + minted.toString() + ' of 11,111. Pick a phase, set your amount, and confirm in your wallet. Contract deployed and verified on BNB Mainnet 56: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6.';
+  var warn = document.getElementById('mintWarn'); if (warn && enabled) { warn.innerHTML = '<b>Mint is OPEN.</b> Contract address (verified on BNB Mainnet 56): 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. No separate payout address is shown in this mint page or in the AI Agent prompts.'; warn.style.borderColor = '#4a6a4a'; warn.style.background = '#0f1a0f'; warn.style.color = '#cfe3cf'; }
+  var note = document.getElementById('statusNote'); if (note && enabled) note.textContent = 'Contract deployed, mint open';
+  var st = document.getElementById('mintStatus'); if (st && enabled && !__mintConnected) st.textContent = 'Mint is OPEN. Connect wallet to mint.';
 }
 async function loadSupply() {
-  try {
-    if (typeof ethers === 'undefined') { return; }
-    var provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
-    var minted = await c.totalMinted();
-    __mintEnabled = await c.mintEnabled();
-    updateSupplyUI(minted, __mintEnabled);
-  } catch (e) {
-    var el = document.getElementById('supplyLine'); if (el) el.textContent = 'Could not load remaining supply. Please refresh and try again.';
+  var rpcs = ['https://bsc-dataseed.binance.org/', 'https://bsc-dataseed1.binance.org/', 'https://bsc-dataseed2.binance.org/', 'https://bsc.publicnode.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      if (typeof ethers === 'undefined') { return; }
+      var provider = new ethers.JsonRpcProvider(rpcs[i]);
+      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
+      var minted = await c.totalMinted();
+      __mintEnabled = await c.mintEnabled();
+      updateSupplyUI(minted, __mintEnabled);
+      return;
+    } catch (e) { /* try next RPC */ }
   }
+  var el = document.getElementById('supplyLine'); if (el) el.textContent = 'Could not load remaining supply. Click here to retry.';
 }
 
 async function handleMint() {
