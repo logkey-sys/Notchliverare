@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOTCHLIVE — 它们住在你的刘海里</title>
+<meta name="description" content="NOTCHLIVE: 住在手机刘海里的小像素生物。它们在黑暗中沉睡，屏幕亮起的瞬间便醒来发光。">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101010">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NOTCHLIVE">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta property="og:title" content="NOTCHLIVE — 它们住在你的刘海里">
+<meta property="og:description" content="住在手机刘海里的小像素生物。它们在黑暗中沉睡，屏幕亮起时便醒来发光。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://notchlive.xyz/">
+<meta property="og:image" content="https://notchlive.xyz/images/notchling-1-badge.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://notchlive.xyz/images/notchling-1-badge.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Georgia:ital@1&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#101010;--panel:#161616;--line:#2a2a2a;--txt:#ece7db;--mut:#9a9ab0;--red:#ff2d2d;--gold:#ffc93c;--lime:#c8f542}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    background-image:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(60,60,140,.35),transparent 70%),
+    repeating-radial-gradient(circle at 50% 0,transparent 0 46px,rgba(80,120,255,.06) 47px 48px)}
+  a{color:inherit}
+  header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(5,5,8,.9);z-index:5}
+  .logo{font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:1px}
+  .logo b{color:var(--red)}
+  .logo small{display:block;font-family:Inter,sans-serif;font-size:10px;color:var(--mut);letter-spacing:2px;margin-top:6px}
+  nav a{margin-left:18px;color:var(--mut);text-decoration:none;font-size:12px;font-family:monospace;letter-spacing:1px;text-transform:uppercase}
+  .badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-family:monospace;font-size:11px;color:var(--mut);margin-left:18px}
+  nav a:hover{color:var(--txt)}
+  main{max-width:1060px;margin:0 auto;padding:0 20px 60px}
+  .hero{padding:64px 0 30px;text-align:left}
+  .series{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mut);letter-spacing:1px;line-height:2}
+  h1{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(44px,8vw,92px);line-height:1.02;margin:22px 0 10px}
+  h1 em{color:var(--red);font-style:italic}
+  .hero p{color:var(--mut);font-size:17px;line-height:1.7;max-width:640px}
+  .notchbar{margin:26px 0 8px;background:#000;border:1px solid var(--line);border-radius:18px;padding:10px 10px 16px;text-align:center}
+  .notchbar .pill{display:inline-block;background:#111;border:1px solid #333;border-radius:999px;padding:6px 26px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--red)}
+  .notchbar .pill i{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:8px;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.15}}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0}
+  .stat{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .stat span{display:block;color:var(--mut);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+  .stat b{display:block;font-size:26px;margin-top:8px}
+  .stat small{color:var(--mut);font-size:12px}
+  h2{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(30px,5vw,48px);margin:56px 0 8px}
+  h2 em{color:var(--gold)}
+  .secsub{color:var(--mut);line-height:1.7;max-width:640px}
+  .agentbox{border:1px dashed #4a4a6a;background:#0a0a12;border-radius:12px;padding:18px;margin-top:18px}
+  .agentbox code{display:block;background:#000;border:1px solid var(--line);border-radius:8px;padding:14px;white-space:pre-wrap;word-break:break-all;font-size:13px;line-height:1.7;color:#cfe3ff}
+  .agentbox button{margin-top:12px;background:var(--lime);color:#000;border:0;border-radius:8px;padding:11px 18px;font-weight:600;cursor:pointer}
+  .agentbox small{display:block;color:var(--mut);margin-top:10px;line-height:1.6}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:20px}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:start}
+  .feature{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+  .feature img{width:100%;display:block;aspect-ratio:1/1;object-fit:contain;background:#000}
+  .feature div{padding:12px 14px}
+  .feature i{font-family:Georgia,serif}
+  .thumbs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .thumbs img{width:52px;height:52px;object-fit:contain;background:#000;border-radius:8px;border:1px solid var(--line)}
+  .bar{height:10px;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:14px 0}
+  .bar i{display:block;height:100%;width:0%;background:var(--lime)}
+  .card{border:0;background:transparent;border-radius:0;overflow:hidden}
+  .card img{width:100%;display:block;aspect-ratio:1/1;object-fit:contain;background:#000}
+  .card div{padding:10px 0}
+  .card b{font-size:15px}
+  .card span{display:block;color:var(--mut);font-size:12px;margin-top:5px;line-height:1.6}
+  .tier{color:var(--gold);font-family:'Press Start 2P',monospace;font-size:9px}
+  footer{border-top:1px solid var(--line);margin-top:60px;padding:22px 0;color:var(--mut);font-size:12px;line-height:1.8}
+  @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr 1fr}.hero-grid{grid-template-columns:1fr}nav a{margin-left:10px}}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .step{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .step h3{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold);margin:0 0 10px}
+  .step p{color:var(--mut);font-size:13px;line-height:1.7;margin:0}
+  .phasebox{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px;margin-top:14px}
+  .phasebox label{display:block;color:var(--mut);font-size:12px;letter-spacing:1px;margin:12px 0 6px}
+  .phasebox select,.phasebox input{width:100%;background:#000;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:11px;font-size:14px}
+  .mintbtn{background:var(--gold);color:#000;border:0;border-radius:8px;padding:13px 20px;font-weight:700;cursor:not-allowed;opacity:.85;margin-top:14px}
+  .warn{border:1px dashed #a66;background:#1a0f0f;border-radius:10px;padding:12px;color:#f0c0c0;font-size:13px;line-height:1.7;margin-top:14px}
+  .prompts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .promptcard{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .promptcard h3{font-family:'Press Start 2P',monospace;font-size:11px;margin:0 0 10px}
+  .promptcard code{display:block;background:#000;border:1px solid var(--line);border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-all;font-size:12px;line-height:1.7;color:#cfe3ff;min-height:180px}
+  .promptcard button{background:var(--gold);color:#000;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;margin-top:10px}
+  .faq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .faq div{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .faq b{display:block;font-size:14px;margin-bottom:8px}
+  .faq p{color:var(--mut);font-size:13px;line-height:1.7;margin:0}
+  @media(max-width:700px){.steps,.prompts,.faq{grid-template-columns:1fr}}
+
+  /* --- NOTCHLIVE theme animations --- */
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 6px var(--glow,#ffc93c))}50%{filter:drop-shadow(0 0 18px var(--glow,#ffc93c))}}
+  @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+  @keyframes notchPulse{0%{box-shadow:0 0 0 0 rgba(255,45,45,.5)}70%{box-shadow:0 0 0 12px rgba(255,45,45,0)}100%{box-shadow:0 0 0 0 rgba(255,45,45,0)}}
+  @keyframes wakeIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .feature img{animation:floaty 5s ease-in-out infinite,glowPulse 3.5s ease-in-out infinite;--glow:#ffc93c}
+  .card img{animation:floaty 6s ease-in-out infinite,glowPulse 4s ease-in-out infinite;transition:transform .3s}
+  .card:nth-child(odd) img{animation-delay:.6s}
+  .card:hover img{transform:scale(1.06)}
+  .card.tier-common img{--glow:#c0c0c0}.card.tier-uncommon img{--glow:#4ade80}.card.tier-rare img{--glow:#60a5fa}.card.tier-epic img{--glow:#c084fc}.card.tier-legendary img{--glow:#f59e0b}.card.tier-mythic img{--glow:#f472b6}
+  .card.tier-common{border-top:2px solid #c0c0c0}.card.tier-uncommon{border-top:2px solid #4ade80}.card.tier-rare{border-top:2px solid #60a5fa}.card.tier-epic{border-top:2px solid #c084fc}.card.tier-legendary{border-top:2px solid #f59e0b}.card.tier-mythic{border-top:2px solid #f472b6}
+  .notchbar .pill{animation:notchPulse 2s infinite}
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .stars i{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+  main,header{position:relative;z-index:1}
+  .hero,.card{animation:riseIn .7s ease both}
+  .waketoggle{background:#111;color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:12px;margin-top:12px}
+  body.asleep .feature img,body.asleep .card img{animation:none;filter:brightness(.45) saturate(.6)}
+  body.asleep .notchbar .pill{animation:none;background:#222;color:#888}
+  body.asleep .notchbar .pill i{background:#888;animation:none}
+
+  @media(max-width:900px){.steps,.prompts,.faq{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}header{flex-wrap:wrap;gap:10px}nav a{margin-left:10px}}
+  @media(max-width:480px){.stats{grid-template-columns:1fr}.step p,.phasebox select,.phasebox input{font-size:15px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<header>
+  <div class="logo">NOTCH<b>LIVE</b><small>notchlive &middot; BNB SMART CHAIN</small></div>
+  <nav><a href="#mint">铸造</a><a href="#agent">Agent</a><a href="index.html">English</a></nav>
+</header>
+<main>
+  <section class="hero">
+    <div class="series">生成系列 &middot; 11,111 件作品 &middot; BNB 智能链</div>
+    <div class="hero-grid"><div>
+    <h1>它们住在<br>你的<em>刘海里。</em></h1>
+    <p>小生物在手机刘海的黑暗中沉睡。屏幕亮起的瞬间，它们醒来发光——眼睛亮起，犄角捕捉信号，从世界顶部的黑色横条中注视着你。</p>
+    <div class="notchbar"><span class="pill"><i></i>LIVE</span></div>
+    <div><button class="waketoggle" onclick="toggleWake()" id="wakebtn">让 Notchling 入睡</button><br><small style="color:var(--mut);font-size:12px">它们在黑暗中沉睡，屏幕亮起时便醒来发光。</small></div>
+    </div><div>
+    <div class="feature"><img src="images/notchling-1-badge.png" alt="Notchling 1 featured"><div><i>Notchling #1 &mdash; 第一缕光</i><br><span style="font-family:monospace;font-size:12px;color:var(--mut)">01 / 40 &middot; 冰蓝 / 紫色 &middot; 红色 LIVE</span></div></div>
+    <div class="thumbs"><img loading="lazy" decoding="async" src="images/notchling-1-badge.png" alt="1"><img loading="lazy" decoding="async" src="images/notchling-2-badge.png" alt="2"><img loading="lazy" decoding="async" src="images/notchling-3-badge.png" alt="3"><img loading="lazy" decoding="async" src="images/notchling-4-badge.png" alt="4"><img loading="lazy" decoding="async" src="images/notchling-5-badge.png" alt="5"><img loading="lazy" decoding="async" src="images/notchling-6-badge.png" alt="6"><img loading="lazy" decoding="async" src="images/notchling-7-badge.png" alt="7"><img loading="lazy" decoding="async" src="images/notchling-8-badge.png" alt="8"><img loading="lazy" decoding="async" src="images/notchling-9-badge.png" alt="9"><img loading="lazy" decoding="async" src="images/notchling-10-badge.png" alt="10"><img loading="lazy" decoding="async" src="images/notchling-11.png" alt="11"><img loading="lazy" decoding="async" src="images/notchling-12.png" alt="12"><img loading="lazy" decoding="async" src="images/notchling-13.png" alt="13"><img loading="lazy" decoding="async" src="images/notchling-14.png" alt="14"><img loading="lazy" decoding="async" src="images/notchling-15.png" alt="15"><img loading="lazy" decoding="async" src="images/notchling-16.png" alt="16"><img loading="lazy" decoding="async" src="images/notchling-17.png" alt="17"><img loading="lazy" decoding="async" src="images/notchling-18.png" alt="18"><img loading="lazy" decoding="async" src="images/notchling-19.png" alt="19"><img loading="lazy" decoding="async" src="images/notchling-20.png" alt="20"><img loading="lazy" decoding="async" src="images/notchling-21.png" alt="21"><img loading="lazy" decoding="async" src="images/notchling-22.png" alt="22"><img loading="lazy" decoding="async" src="images/notchling-23.png" alt="23"><img loading="lazy" decoding="async" src="images/notchling-24.png" alt="24"><img loading="lazy" decoding="async" src="images/notchling-25.png" alt="25"><img loading="lazy" decoding="async" src="images/notchling-26.png" alt="26"><img loading="lazy" decoding="async" src="images/notchling-27.png" alt="27"><img loading="lazy" decoding="async" src="images/notchling-28.png" alt="28"><img loading="lazy" decoding="async" src="images/notchling-29.png" alt="29"><img loading="lazy" decoding="async" src="images/notchling-30.png" alt="30"><img loading="lazy" decoding="async" src="images/notchling-31.png" alt="31"><img loading="lazy" decoding="async" src="images/notchling-32.png" alt="32"><img loading="lazy" decoding="async" src="images/notchling-33.png" alt="33"><img loading="lazy" decoding="async" src="images/notchling-34.png" alt="34"><img loading="lazy" decoding="async" src="images/notchling-35.png" alt="35"><img loading="lazy" decoding="async" src="images/notchling-36.png" alt="36"><img loading="lazy" decoding="async" src="images/notchling-37.png" alt="37"><img loading="lazy" decoding="async" src="images/notchling-38.png" alt="38"><img loading="lazy" decoding="async" src="images/notchling-39.png" alt="39"><img loading="lazy" decoding="async" src="images/notchling-40.png" alt="40"></div>
+    </div></div>
+  </section>
+
+  <section id="mint">
+    <h2>铸造<em>步骤。</em></h2>
+    <div class="bar"><i></i></div>
+    <p class="secsub">铸造尚未开放 &mdash; 0 / 11,111。选择铸造方式、设置数量，开放后在钱包中确认。目前这里不会铸造也不会收费。合约已在 BNB 主网 56 上部署并验证：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。在所有者签署 setMintEnabled(true) 之前，铸造保持关闭。</p>
+    <div class="steps">
+      <div class="step"><h3>第 1 步</h3><p>点击连接钱包，并在钱包（OKX、MetaMask 或任何其他 EVM 钱包）中批准 BNB 链网络连接。持有 Binance Agent ID 的钱包也可以使用——连接后本页面会自动检测。</p></div>
+      <div class="step"><h3>第 2 步</h3><p>从同一个完整池中选择铸造方式：免费铸造（0.0001 BNB 手续费）或付费铸造（每个 NFT 0.001 BNB），然后设置铸造数量。没有任何代币专门预留给某一方式。</p></div>
+      <div class="step"><h3>第 3 步</h3><p>点击铸造按钮并在钱包中确认交易。你的 Notchling 会立即记录在你的钱包名下——是随机未铸造的代币，而不是按画廊顺序。</p></div>
+    </div>
+    <div class="phasebox">
+      <label>铸造方式</label>
+      <select id="phase" onchange="updateMint()">
+        <option value="free">免费铸造 &mdash; NFT 免费，每次铸造 0.0001 BNB 手续费</option>
+        <option value="paid">付费铸造 &mdash; 每个 NFT 0.001 BNB</option>
+      </select>
+      <label>铸造数量</label>
+      <input id="amount" type="number" min="1" max="10" value="1" onchange="updateMint()">
+      <p id="total" style="color:var(--mut);font-size:13px;line-height:1.7">Total: 1 &times; 0.0001 BNB = 0.0001 BNB, plus BNB Chain gas.</p>
+      <button class="mintbtn" id="mintBtn" onclick="handleMint()">连接钱包开始铸造</button>
+      <p id="mintStatus" style="color:var(--mut);font-size:13px;line-height:1.7">钱包未连接。铸造目前关闭，直到所有者签署 setMintEnabled(true)。</p>
+      <div class="warn"><b>铸造尚未开放。</b>合约地址（已在 BNB 主网 56 上验证）：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。本铸造页面或 AI Agent 提示词中均不显示单独的收款地址。在所有者签署 setMintEnabled(true) 之前，铸造按钮保持禁用。</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span>状态</span><b>在线</b><small>合约已部署，铸造关闭</small></div>
+      <div class="stat"><span>总量</span><b>11,111</b><small>计划总供应量 &mdash; 不是 10,000</small></div>
+      <div class="stat"><span>稀有度</span><b>6</b><small>从普通到神话</small></div>
+      <div class="stat"><span>链</span><b>BNB 56</b><small>优先支持 OKX 钱包</small></div>
+    </div>
+    <p class="secsub"><b>不分阶段 &mdash; 由所有者锁定：</b>全部 11,111 个属于同一个池。没有免费代币区间，也没有付费代币区间。铸造时你选择免费铸造（0.0001 BNB 手续费）或付费铸造（每个 NFT 0.001 BNB），无论哪种，你都会从同一个 11,111 池中获得一个随机未铸造代币，直到售罄。</p>
+  </section>
+
+  <section id="agent">
+    <h2>通过 <em>AI Agent 铸造。</em></h2>
+    <p class="secsub">不想手动连接钱包？在下方粘贴你的钱包地址——两个提示词会自动填写——然后复制提示词并发送给你的 AI Agent。免费铸造和付费铸造各有一个提示词，每个提示词中的数量会跟随你在上方铸造框中选择的数量。持有 Binance Agent ID 的钱包也可以使用。</p>
+    <div class="phasebox">
+      <label>你的钱包地址 &mdash; 粘贴到这里</label>
+      <input id="wallet" type="text" placeholder="0x... 粘贴你的 BNB 链钱包地址" oninput="updateMint()">
+      <p style="color:var(--mut);font-size:12px;line-height:1.7">粘贴你的钱包地址，下方两个提示词会自动填写——然后点击复制提示词。在上方铸造部分连接钱包也会自动填写此字段。切勿分享你的助记词或私钥。</p>
+    </div>
+    <div class="prompts">
+      <div class="promptcard"><h3>提示词 &mdash; 免费铸造</h3><code id="promptFree"></code><button onclick="copyText('promptFree')">复制提示词</button></div>
+      <div class="promptcard"><h3>提示词 &mdash; 付费铸造</h3><code id="promptPaid"></code><button onclick="copyText('promptPaid')">复制提示词</button></div>
+    </div>
+    <p class="secsub">两个提示词中的合约地址均为已验证部署的 NOTCHLIVE 合约：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。两个提示词中均不包含单独的收款地址。Agent 只会通过你控制的钱包准备交易——切勿分享你的助记词或私钥。提示词金额跟随你的铸造选择：免费铸造总计 数量 &times; 0.0001 BNB，付费铸造 数量 &times; 0.001 BNB。</p>
+  </section>
+
+
+  <section id="faq">
+    <h2>常见<em>问题。</em></h2>
+    <div class="faq">
+      <div><b>NOTCHLIVE 的总供应量是多少？</b><p>总供应量为 11,111 个 NFT，属于同一个池，不分免费/付费。免费和付费铸造都会从同一个池中随机抽取未铸造代币，而不是按画廊顺序，网站画廊仅保留 40 件样品作品。</p></div>
+      <div><b>为什么免费铸造还要收费？</b><p>NFT 本身是免费的（0 BNB）。你每次铸造只需支付 0.0001 BNB 铸造费。该费用支付到合约中，之后只有所有者可以提取。没有单独的国库地址。</p></div>
+      <div><b>付费铸造多少钱？</b><p>每个 NFT 0.001 BNB。发送总额为 铸造数量 &times; 0.001 BNB，另加 BNB 链 Gas。</p></div>
+      <div><b>不手动连接钱包可以铸造吗？</b><p>可以。在 AI Agent 部分粘贴你的钱包地址——两个提示词会自动填写——然后复制提示词并发送给可以访问 BNB 链钱包的 AI Agent。</p></div>
+      <div><b>可以用 Binance Agent ID 铸造吗？</b><p>可以。如果你的钱包持有 Binance Agent ID，无论手动流程还是 AI Agent 流程都可以使用它铸造。</p></div>
+    </div>
+  </section>
+
+
+  <footer>
+    Built by <a href="https://x.com/Notchlive" target="_blank" rel="noopener">@Notchlive</a>
+  </footer>
+</main>
+<script>
+function fmt(n){ return (Math.round(n*10000)/10000).toFixed(4); }
+function updateMint(){
+  var phase = document.getElementById('phase').value;
+  var amt = parseInt(document.getElementById('amount').value || '1', 10);
+  if (amt < 1) amt = 1;
+  var wallet = (document.getElementById('wallet').value || '[粘贴你的钱包地址]').trim() || '[粘贴你的钱包地址]';
+  var price = phase === 'free' ? 0.0001 : 0.001;
+  document.getElementById('total').textContent = '总计：' + amt + ' x ' + price.toFixed(4) + ' BNB = ' + fmt(amt*price) + ' BNB，另加 BNB 链 Gas。';
+  if (typeof mintButtonLabel === 'function') mintButtonLabel();
+  var callFree = '调用 mintFree(' + amt + ')，金额为 0.0001 BNB x ' + amt + ' = ' + fmt(amt*0.0001) + ' BNB。';
+  var callPaid = '调用 mintPaid(' + amt + ')，金额为 0.001 BNB x ' + amt + ' = ' + fmt(amt*0.001) + ' BNB。';
+  document.getElementById('promptFree').textContent = '在 BNB 链（链 ID 56）上免费铸造 ' + amt + ' 个 Notchling NFT。合约：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6 My wallet: ' + wallet + ' 持有 Binance Agent ID 的钱包也可用于本次铸造。' + callFree + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
+  document.getElementById('promptPaid').textContent = '在 BNB 链（链 ID 56）上付费铸造 ' + amt + ' 个 Notchling NFT。合约：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6 My wallet: ' + wallet + ' 持有 Binance Agent ID 的钱包也可用于本次铸造。' + callPaid + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
+}
+
+var CONTRACT_ADDRESS = '0xcB46C50b36657aAC352aFe5160eeE60D54B017B6';
+var MINT_ABI = ["function mintFree(uint256 amount) payable", "function mintPaid(uint256 amount) payable", "function mintEnabled() view returns (bool)", "function totalMinted() view returns (uint256)"];
+var __mintProvider = null, __mintSigner = null, __mintConnected = false, __mintEnabled = false;
+function mintEth() { return window.ethereum || (window.okxwallet && window.okxwallet.ethereum) || null; }
+function setMintStatus(msg) { var el = document.getElementById('mintStatus'); if (el) el.textContent = msg; }
+function mintButtonLabel() {
+  var btn = document.getElementById('mintBtn'); if (!btn) return;
+  var phase = document.getElementById('phase').value;
+  var amt = parseInt(document.getElementById('amount').value || '1', 10); if (amt < 1) amt = 1; if (amt > 10) amt = 10;
+  var price = phase === 'free' ? 0.0001 : 0.001;
+  if (!__mintConnected) { btn.textContent = '连接钱包开始铸造'; btn.disabled = false; }
+  else if (!__mintEnabled) { btn.textContent = '铸造尚未开放 — 再次检查'; btn.disabled = false; }
+  else { btn.textContent = '铸造 ' + amt + ' 个 Notchling — ' + fmt(amt*price) + ' BNB'; btn.disabled = false; }
+}
+async function checkMintStatus() {
+  try {
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, __mintProvider);
+    __mintEnabled = await c.mintEnabled();
+    var minted = await c.totalMinted();
+    setMintStatus(__mintEnabled ? ('铸造已开放。已铸造：' + minted.toString() + ' / 11,111。') : ('铸造仍关闭。已铸造：' + minted.toString() + ' / 11,111。仅在所有者签署 setMintEnabled(true) 后开放。'));
+  } catch (e) { setMintStatus('无法读取铸造状态。请确保你的钱包在 BNB 主网（56）上，然后重试。'); }
+  mintButtonLabel();
+}
+async function handleMint() {
+  if (typeof ethers === 'undefined') { setMintStatus('钱包库加载失败。请检查网络连接并刷新。'); return; }
+  var e = mintEth();
+  if (!e) { setMintStatus('未找到钱包。请先安装 MetaMask 或 OKX 钱包，然后刷新本页面。'); return; }
+  try {
+    if (!__mintConnected) {
+      __mintProvider = new ethers.BrowserProvider(e);
+      await e.request({ method: 'eth_requestAccounts' });
+      __mintSigner = await __mintProvider.getSigner();
+      var net = await __mintProvider.getNetwork();
+      if (net.chainId.toString() !== '56') {
+        try { await e.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }
+        catch (sw) {
+          if (sw && sw.code === 4902) { await e.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x38', chainName: 'BNB Smart Chain', nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, rpcUrls: ['https://bsc-dataseed.binance.org/'], blockExplorerUrls: ['https://bscscan.com'] }] }); }
+          else { throw sw; }
+        }
+        __mintProvider = new ethers.BrowserProvider(e);
+        __mintSigner = await __mintProvider.getSigner();
+      }
+      __mintConnected = true;
+      var addr = await __mintSigner.getAddress();
+      document.getElementById('wallet').value = addr;
+      setMintStatus('已连接：' + addr + '。正在读取铸造状态…');
+      await checkMintStatus();
+      return;
+    }
+    if (!__mintEnabled) { setMintStatus('正在再次检查铸造状态…'); await checkMintStatus(); return; }
+    var phase = document.getElementById('phase').value;
+    var amt = parseInt(document.getElementById('amount').value || '1', 10); if (amt < 1) amt = 1; if (amt > 10) amt = 10;
+    var price = phase === 'free' ? 0.0001 : 0.001;
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, __mintSigner);
+    setMintStatus('请在钱包中确认铸造交易…');
+    var tx = phase === 'free' ? await c.mintFree(amt, { value: ethers.parseEther((amt*price).toFixed(4)) }) : await c.mintPaid(amt, { value: ethers.parseEther((amt*price).toFixed(4)) });
+    setMintStatus('铸造交易已发送：' + tx.hash + '。正在等待网络确认…');
+    await tx.wait();
+    setMintStatus('铸造成功！交易：' + tx.hash + '。你的 Notchling 是来自同一个 11,111 池的随机未铸造代币。');
+    await checkMintStatus();
+  } catch (err) { setMintStatus('铸造已取消或失败：' + (err && (err.shortMessage || err.message) || '请重试。')); mintButtonLabel(); }
+}
+function copyText(id){
+  var t = document.getElementById(id).textContent;
+  if (navigator.clipboard) { navigator.clipboard.writeText(t); }
+}
+function toggleWake(){
+  var asleep = document.body.classList.toggle('asleep');
+  var pill = document.querySelector('.notchbar .pill');
+  var btn = document.getElementById('wakebtn');
+  if (pill) pill.innerHTML = asleep ? '<i></i>睡眠' : '<i></i>在线';
+  if (btn) btn.textContent = asleep ? '唤醒 Notchling' : '让 Notchling 入睡';
+}
+(function(){
+  var stars = document.querySelector('.stars');
+  if (stars) {
+    for (var i = 0; i < 40; i++) {
+      var s = document.createElement('i');
+      s.style.left = Math.random()*100 + '%';
+      s.style.top = Math.random()*100 + '%';
+      s.style.animationDelay = (Math.random()*3) + 's';
+      s.style.animationDuration = (2 + Math.random()*3) + 's';
+      stars.appendChild(s);
+    }
+  }
+  document.querySelectorAll('.card').forEach(function(card){
+    var tier = card.querySelector('.tier');
+    if (tier) card.classList.add('tier-' + tier.textContent.trim().toLowerCase());
+  });
+})();
+updateMint();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
