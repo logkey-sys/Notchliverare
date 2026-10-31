@@ -1,0 +1,43 @@
+{
+  "name": "Notchling #6915",
+  "description": "A small pixel creature that lives inside your phone's notch.",
+  "image": "https://notchlive.xyz/collection-images/6915.png",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Horns",
+      "value": "Golden crown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Background Index",
+      "value": 2
+    },
+    {
+      "trait_type": "Pattern",
+      "value": "Spots"
+    },
+    {
+      "trait_type": "Glow",
+      "value": "Soft"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Open"
+    },
+    {
+      "trait_type": "Badge",
+      "value": "No"
+    }
+  ]
+}
