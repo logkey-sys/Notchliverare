@@ -148,8 +148,8 @@
   <section id="mint">
     <h2>铸造<em>步骤。</em></h2>
     <div class="bar"><i></i></div>
-    <p id="supplyLine" style="color:var(--mut);font-size:13px;line-height:1.7">正在加载剩余供应量…</p>
-    <p class="secsub">铸造尚未开放 &mdash; 0 / 11,111。选择铸造方式、设置数量，开放后在钱包中确认。目前这里不会铸造也不会收费。合约已在 BNB 主网 56 上部署并验证：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。在所有者签署 setMintEnabled(true) 之前，铸造保持关闭。</p>
+    <p id="supplyLine" onclick="loadSupply()" style="cursor:pointer;color:var(--mut);font-size:13px;line-height:1.7">正在加载剩余供应量…</p>
+    <p class="secsub" id="mintIntro">铸造尚未开放 &mdash; 0 / 11,111。选择铸造方式、设置数量，开放后在钱包中确认。目前这里不会铸造也不会收费。合约已在 BNB 主网 56 上部署并验证：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。在所有者签署 setMintEnabled(true) 之前，铸造保持关闭。</p>
     <div class="steps">
       <div class="step"><h3>第 1 步</h3><p>点击连接钱包，并在钱包（OKX、MetaMask 或任何其他 EVM 钱包）中批准 BNB 链网络连接。持有 Binance Agent ID 的钱包也可以使用——连接后本页面会自动检测。</p></div>
       <div class="step"><h3>第 2 步</h3><p>从同一个完整池中选择铸造方式：免费铸造（0.0001 BNB 手续费）或付费铸造（每个 NFT 0.001 BNB），然后设置铸造数量。没有任何代币专门预留给某一方式。</p></div>
@@ -166,10 +166,10 @@
       <p id="total" style="color:var(--mut);font-size:13px;line-height:1.7">Total: 1 &times; 0.0001 BNB = 0.0001 BNB, plus BNB Chain gas.</p>
       <button class="mintbtn" id="mintBtn" onclick="handleMint()">连接钱包开始铸造</button>
       <p id="mintStatus" style="color:var(--mut);font-size:13px;line-height:1.7">钱包未连接。铸造目前关闭，直到所有者签署 setMintEnabled(true)。</p>
-      <div class="warn"><b>铸造尚未开放。</b>合约地址（已在 BNB 主网 56 上验证）：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。本铸造页面或 AI Agent 提示词中均不显示单独的收款地址。在所有者签署 setMintEnabled(true) 之前，铸造按钮保持禁用。</div>
+      <div class="warn" id="mintWarn"><b>铸造尚未开放。</b>合约地址（已在 BNB 主网 56 上验证）：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。本铸造页面或 AI Agent 提示词中均不显示单独的收款地址。在所有者签署 setMintEnabled(true) 之前，铸造按钮保持禁用。</div>
     </div>
     <div class="stats">
-      <div class="stat"><span>状态</span><b>在线</b><small>合约已部署，铸造关闭</small></div>
+      <div class="stat"><span>状态</span><b>在线</b><small id="statusNote">合约已部署，铸造关闭</small></div>
       <div class="stat"><span>总量</span><b>11,111</b></div>
       <div class="stat"><span>稀有度</span><b>6</b><small>从普通到神话</small></div>
       <div class="stat"><span>链</span><b>BNB</b><small>BNB 智能链 &middot; 56 &middot; 优先支持 OKX 钱包</small></div>
@@ -251,21 +251,29 @@ async function checkMintStatus() {
 
 function updateSupplyUI(minted, enabled) {
   var bar = document.querySelector('.bar i'); if (bar) bar.style.width = (Number(minted) / 11111 * 100).toFixed(2) + '%';
-  var el = document.getElementById('supplyLine'); if (!el) return;
-  var remaining = 11111 - Number(minted);
-  el.textContent = '已铸造：' + minted.toString() + ' / 11,111 · 剩余：' + remaining.toLocaleString('en-US') + (enabled ? ' · 铸造已开放' : ' · 铸造关闭');
+  var el = document.getElementById('supplyLine'); if (el) {
+    var remaining = 11111 - Number(minted);
+    el.textContent = '已铸造：' + minted.toString() + ' / 11,111 · 剩余：' + remaining.toLocaleString('en-US') + (enabled ? ' · 铸造已开放' : ' · 铸造关闭');
+  }
+  var intro = document.getElementById('mintIntro'); if (intro && enabled) intro.textContent = '铸造已开放 — ' + minted.toString() + ' / 11,111。选择铸造方式、设置数量，然后在钱包中确认。合约已在 BNB 主网 56 上部署并验证：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。';
+  var warn = document.getElementById('mintWarn'); if (warn && enabled) { warn.innerHTML = '<b>铸造已开放。</b>合约地址（已在 BNB 主网 56 上验证）：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。两个提示词中均不包含单独的收款地址。'; warn.style.borderColor = '#4a6a4a'; warn.style.background = '#0f1a0f'; warn.style.color = '#cfe3cf'; }
+  var note = document.getElementById('statusNote'); if (note && enabled) note.textContent = '合约已部署，铸造已开放';
+  var st = document.getElementById('mintStatus'); if (st && enabled && !__mintConnected) st.textContent = '铸造已开放。连接钱包开始铸造。';
 }
 async function loadSupply() {
-  try {
-    if (typeof ethers === 'undefined') { return; }
-    var provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
-    var minted = await c.totalMinted();
-    __mintEnabled = await c.mintEnabled();
-    updateSupplyUI(minted, __mintEnabled);
-  } catch (e) {
-    var el = document.getElementById('supplyLine'); if (el) el.textContent = '无法加载剩余供应量，请刷新重试。';
+  var rpcs = ['https://bsc-dataseed.binance.org/', 'https://bsc-dataseed1.binance.org/', 'https://bsc-dataseed2.binance.org/', 'https://bsc.publicnode.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      if (typeof ethers === 'undefined') { return; }
+      var provider = new ethers.JsonRpcProvider(rpcs[i]);
+      var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
+      var minted = await c.totalMinted();
+      __mintEnabled = await c.mintEnabled();
+      updateSupplyUI(minted, __mintEnabled);
+      return;
+    } catch (e) { /* try next RPC */ }
   }
+  var el = document.getElementById('supplyLine'); if (el) el.textContent = '无法加载剩余供应量，点击此处重试。';
 }
 
 async function handleMint() {
