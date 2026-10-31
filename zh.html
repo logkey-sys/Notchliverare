@@ -148,6 +148,7 @@
   <section id="mint">
     <h2>铸造<em>步骤。</em></h2>
     <div class="bar"><i></i></div>
+    <p id="supplyLine" style="color:var(--mut);font-size:13px;line-height:1.7">正在加载剩余供应量…</p>
     <p class="secsub">铸造尚未开放 &mdash; 0 / 11,111。选择铸造方式、设置数量，开放后在钱包中确认。目前这里不会铸造也不会收费。合约已在 BNB 主网 56 上部署并验证：0xcB46C50b36657aAC352aFe5160eeE60D54B017B6。在所有者签署 setMintEnabled(true) 之前，铸造保持关闭。</p>
     <div class="steps">
       <div class="step"><h3>第 1 步</h3><p>点击连接钱包，并在钱包（OKX、MetaMask 或任何其他 EVM 钱包）中批准 BNB 链网络连接。持有 Binance Agent ID 的钱包也可以使用——连接后本页面会自动检测。</p></div>
@@ -173,7 +174,6 @@
       <div class="stat"><span>稀有度</span><b>6</b><small>从普通到神话</small></div>
       <div class="stat"><span>链</span><b>BNB</b><small>BNB 智能链 &middot; 56 &middot; 优先支持 OKX 钱包</small></div>
     </div>
-    <p class="secsub"><b>不分阶段 &mdash; 由所有者锁定：</b>全部 11,111 个属于同一个池。没有免费代币区间，也没有付费代币区间。铸造时你选择免费铸造（0.0001 BNB 手续费）或付费铸造（每个 NFT 0.001 BNB），无论哪种，你都会从同一个 11,111 池中获得一个随机未铸造代币，直到售罄。</p>
   </section>
 
   <section id="agent">
@@ -244,9 +244,30 @@ async function checkMintStatus() {
     __mintEnabled = await c.mintEnabled();
     var minted = await c.totalMinted();
     setMintStatus(__mintEnabled ? ('铸造已开放。已铸造：' + minted.toString() + ' / 11,111。') : ('铸造仍关闭。已铸造：' + minted.toString() + ' / 11,111。仅在所有者签署 setMintEnabled(true) 后开放。'));
+    updateSupplyUI(minted, __mintEnabled);
   } catch (e) { setMintStatus('无法读取铸造状态。请确保你的钱包在 BNB 主网（56）上，然后重试。'); }
   mintButtonLabel();
 }
+
+function updateSupplyUI(minted, enabled) {
+  var bar = document.querySelector('.bar i'); if (bar) bar.style.width = (Number(minted) / 11111 * 100).toFixed(2) + '%';
+  var el = document.getElementById('supplyLine'); if (!el) return;
+  var remaining = 11111 - Number(minted);
+  el.textContent = '已铸造：' + minted.toString() + ' / 11,111 · 剩余：' + remaining.toLocaleString('en-US') + (enabled ? ' · 铸造已开放' : ' · 铸造关闭');
+}
+async function loadSupply() {
+  try {
+    if (typeof ethers === 'undefined') { return; }
+    var provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
+    var minted = await c.totalMinted();
+    __mintEnabled = await c.mintEnabled();
+    updateSupplyUI(minted, __mintEnabled);
+  } catch (e) {
+    var el = document.getElementById('supplyLine'); if (el) el.textContent = '无法加载剩余供应量，请刷新重试。';
+  }
+}
+
 async function handleMint() {
   if (typeof ethers === 'undefined') { setMintStatus('钱包库加载失败。请检查网络连接并刷新。'); return; }
   var e = mintEth();
@@ -315,6 +336,7 @@ function toggleWake(){
   });
 })();
 updateMint();
+loadSupply();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
