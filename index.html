@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOTCHLIVE — They live in your notch</title>
+<meta name="description" content="NOTCHLIVE: small pixel creatures that live inside your phone's notch. They sleep in the dark and wake, glowing, the moment the screen goes live.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Georgia:ital@1&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#101010;--panel:#161616;--line:#2a2a2a;--txt:#ece7db;--mut:#9a9ab0;--red:#ff2d2d;--gold:#ffc93c;--lime:#c8f542}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    background-image:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(60,60,140,.35),transparent 70%),
+    repeating-radial-gradient(circle at 50% 0,transparent 0 46px,rgba(80,120,255,.06) 47px 48px)}
+  a{color:inherit}
+  header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(5,5,8,.9);z-index:5}
+  .logo{font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:1px}
+  .logo b{color:var(--red)}
+  .logo small{display:block;font-family:Inter,sans-serif;font-size:10px;color:var(--mut);letter-spacing:2px;margin-top:6px}
+  nav a{margin-left:18px;color:var(--mut);text-decoration:none;font-size:12px;font-family:monospace;letter-spacing:1px;text-transform:uppercase}
+  .badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-family:monospace;font-size:11px;color:var(--mut);margin-left:18px}
+  nav a:hover{color:var(--txt)}
+  main{max-width:1060px;margin:0 auto;padding:0 20px 60px}
+  .hero{padding:64px 0 30px;text-align:left}
+  .series{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mut);letter-spacing:1px;line-height:2}
+  h1{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(44px,8vw,92px);line-height:1.02;margin:22px 0 10px}
+  h1 em{color:var(--red);font-style:italic}
+  .hero p{color:var(--mut);font-size:17px;line-height:1.7;max-width:640px}
+  .notchbar{margin:26px 0 8px;background:#000;border:1px solid var(--line);border-radius:18px;padding:10px 10px 16px;text-align:center}
+  .notchbar .pill{display:inline-block;background:#111;border:1px solid #333;border-radius:999px;padding:6px 26px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--red)}
+  .notchbar .pill i{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:8px;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.15}}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0}
+  .stat{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .stat span{display:block;color:var(--mut);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+  .stat b{display:block;font-size:26px;margin-top:8px}
+  .stat small{color:var(--mut);font-size:12px}
+  h2{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(30px,5vw,48px);margin:56px 0 8px}
+  h2 em{color:var(--gold)}
+  .secsub{color:var(--mut);line-height:1.7;max-width:640px}
+  .agentbox{border:1px dashed #4a4a6a;background:#0a0a12;border-radius:12px;padding:18px;margin-top:18px}
+  .agentbox code{display:block;background:#000;border:1px solid var(--line);border-radius:8px;padding:14px;white-space:pre-wrap;word-break:break-all;font-size:13px;line-height:1.7;color:#cfe3ff}
+  .agentbox button{margin-top:12px;background:var(--lime);color:#000;border:0;border-radius:8px;padding:11px 18px;font-weight:600;cursor:pointer}
+  .agentbox small{display:block;color:var(--mut);margin-top:10px;line-height:1.6}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:20px}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:start}
+  .feature{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+  .feature img{width:100%;display:block;aspect-ratio:1/1;object-fit:contain;background:#000}
+  .feature div{padding:12px 14px}
+  .feature i{font-family:Georgia,serif}
+  .thumbs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .thumbs img{width:52px;height:52px;object-fit:contain;background:#000;border-radius:8px;border:1px solid var(--line)}
+  .bar{height:10px;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:14px 0}
+  .bar i{display:block;height:100%;width:0%;background:var(--lime)}
+  .card{border:0;background:transparent;border-radius:0;overflow:hidden}
+  .card img{width:100%;display:block;aspect-ratio:1/1;object-fit:contain;background:#000}
+  .card div{padding:10px 0}
+  .card b{font-size:15px}
+  .card span{display:block;color:var(--mut);font-size:12px;margin-top:5px;line-height:1.6}
+  .tier{color:var(--gold);font-family:'Press Start 2P',monospace;font-size:9px}
+  footer{border-top:1px solid var(--line);margin-top:60px;padding:22px 0;color:var(--mut);font-size:12px;line-height:1.8}
+  @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr 1fr}.hero-grid{grid-template-columns:1fr}nav a{margin-left:10px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NOTCH<b>LIVE</b><small>notchlive &middot; BNB SMART CHAIN</small></div>
+  <nav><a href="#mint">Mint</a><a href="#agent">Agent</a><a href="#works">Works</a><span class="badge">&#9679; PREVIEW</span></nav>
+</header>
+<main>
+  <section class="hero">
+    <div class="series">GENERATIVE SERIES &middot; PIXEL CREATURES &middot; BNB SMART CHAIN</div>
+    <div class="hero-grid"><div>
+    <h1>They live<br>in your <em>notch.</em></h1>
+    <p>Small creatures sleep inside your phone's notch, in the dark. The moment the screen goes live, they wake up glowing &mdash; eyes lit, horns catching the signal, watching from the black bar at the top of your world.</p>
+    <div class="notchbar"><span class="pill"><i></i>LIVE</span></div>
+    </div><div>
+    <div class="feature"><img src="images/notchling-1-badge.png" alt="Notchling 1 featured"><div><i>Notchling #1 &mdash; First Light</i><br><span style="font-family:monospace;font-size:12px;color:var(--mut)">01 / 10 &middot; ICE BLUE / PURPLE &middot; RED LIVE</span></div></div>
+    <div class="thumbs"><img src="images/notchling-1-badge.png" alt="1"><img src="images/notchling-2-badge.png" alt="2"><img src="images/notchling-3-badge.png" alt="3"><img src="images/notchling-4-badge.png" alt="4"><img src="images/notchling-5-badge.png" alt="5"><img src="images/notchling-6-badge.png" alt="6"><img src="images/notchling-7-badge.png" alt="7"><img src="images/notchling-8-badge.png" alt="8"><img src="images/notchling-9-badge.png" alt="9"><img src="images/notchling-10-badge.png" alt="10"></div>
+    </div></div>
+  </section>
+
+  <section id="mint">
+    <h2>Mint <em>progress.</em></h2>
+    <div class="bar"><i></i></div>
+    <p class="secsub">Mint not open &mdash; 0 of supply TBD. Bar stays empty until a real contract exists.</p>
+    <p class="secsub">Preview version. The mint contract is not deployed yet, so no mint is open and no number below is a live on-chain count. What you see here are the 10 sample works made for the series.</p>
+    <div class="stats">
+      <div class="stat"><span>Status</span><b>Preview</b><small>Contract not deployed yet</small></div>
+      <div class="stat"><span>Sample works</span><b>10</b><small>Notchlings #1&ndash;#10</small></div>
+      <div class="stat"><span>Tiers</span><b>6</b><small>Common to Mythic</small></div>
+      <div class="stat"><span>Chain</span><b>BNB 56</b><small>OKX wallet first</small></div>
+    </div>
+  </section>
+
+  <section id="agent">
+    <h2>01 &middot; For your <em>agent.</em></h2>
+    <p class="secsub">One line. Your agent does the rest. This prompt is a draft &mdash; it only becomes usable once the mint contract is deployed and its address replaces the placeholder below.</p>
+    <div class="agentbox">
+      <code id="agentprompt">Read the NOTCHLIVE mint guide and use my Binance Agentic Wallet to mint my Notchling from contract [CONTRACT ADDRESS - NOT DEPLOYED YET] on BNB Smart Chain.</code>
+      <button onclick="copyPrompt()">Copy prompt</button>
+      <small id="copymsg">No wallet connection is needed to read this page. Minting, fees, and supply will be confirmed from the contract itself once it exists &mdash; never from this preview text.</small>
+    </div>
+  </section>
+
+  <section id="works">
+    <h2>02 &middot; Freshly <em>woken.</em></h2>
+    <p class="secsub">The first ten Notchlings. Each one carries its tier badge inside the artwork itself, so rarity is visible at a glance.</p>
+    <div class="grid">
+      <div class="card"><img src="images/notchling-1-badge.png" alt="Notchling 1"><div><b>Notchling #1 &mdash; First Light</b><span class="tier">RARE</span><span>Ice Blue &middot; Purple horns &middot; Red LIVE eyes</span></div></div>
+      <div class="card"><img src="images/notchling-2-badge.png" alt="Notchling 2"><div><b>Notchling #2 &mdash; Star Peek</b><span class="tier">UNCOMMON</span><span>Golden Yellow &middot; No horns &middot; Green eyes</span></div></div>
+      <div class="card"><img src="images/notchling-3-badge.png" alt="Notchling 3"><div><b>Notchling #3 &mdash; Nebula Crown</b><span class="tier">EPIC</span><span>Purple &middot; Golden crown &middot; Blue eyes</span></div></div>
+      <div class="card"><img src="images/notchling-4-badge.png" alt="Notchling 4"><div><b>Notchling #4 &mdash; Forest Signal</b><span class="tier">COMMON</span><span>Green &middot; Leaf horns &middot; Yellow eyes</span></div></div>
+      <div class="card"><img src="images/notchling-5-badge.png" alt="Notchling 5"><div><b>Notchling #5 &mdash; Ember Imp</b><span class="tier">RARE</span><span>Crimson Red &middot; Black demon horns &middot; Orange eyes</span></div></div>
+      <div class="card"><img src="images/notchling-6-badge.png" alt="Notchling 6"><div><b>Notchling #6 &mdash; Star Pop</b><span class="tier">UNCOMMON</span><span>Pink &middot; Golden star horns &middot; Cyan eyes</span></div></div>
+      <div class="card"><img src="images/notchling-7-badge.png" alt="Notchling 7"><div><b>Notchling #7 &mdash; Halo Frost</b><span class="tier">LEGENDARY</span><span>White Silver &middot; Halo ring &middot; Soft white eyes</span></div></div>
+      <div class="card"><img src="images/notchling-8-badge.png" alt="Notchling 8"><div><b>Notchling #8 &mdash; Sunset Surge</b><span class="tier">EPIC</span><span>Orange &middot; Lightning horns &middot; Violet eyes</span></div></div>
+      <div class="card"><img src="images/notchling-9-badge.png" alt="Notchling 9"><div><b>Notchling #9 &mdash; Tide Drifter</b><span class="tier">COMMON</span><span>Teal &middot; Coral horns &middot; Pink eyes</span></div></div>
+      <div class="card"><img src="images/notchling-10-badge.png" alt="Notchling 10"><div><b>Notchling #10 &mdash; Constellation Keeper</b><span class="tier">MYTHIC</span><span>Void Black &amp; Gold &middot; Crescent moon horns &middot; Gold eyes</span></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div style="font-family:Georgia,serif;font-size:clamp(48px,10vw,110px);line-height:1;color:var(--txt)">NOTCHLIVE</div>
+    NOTCHLIVE &mdash; they live in your notch.<br>
+    Preview site. Domain extension for notchlive still to be confirmed, and the mint contract is not deployed yet, so nothing on this page mints, charges, or counts a live supply.<br>
+    PREVIEW &middot; NOT AFFILIATED WITH BINANCE &middot; BNB SMART CHAIN &middot; 56
+  </footer>
+</main>
+<script>
+function copyPrompt(){
+  var t = document.getElementById('agentprompt').textContent;
+  if (navigator.clipboard) { navigator.clipboard.writeText(t).then(function(){ document.getElementById('copymsg').textContent = 'Prompt copied.'; }); }
+  else { document.getElementById('copymsg').textContent = 'Copy the prompt text above manually.'; }
+}
+</script>
+</body>
+</html>
