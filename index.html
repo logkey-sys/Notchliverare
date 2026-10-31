@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NOTCHLIVE — They live in your notch</title>
 <meta name="description" content="NOTCHLIVE: small pixel creatures that live inside your phone's notch. They sleep in the dark and wake, glowing, the moment the screen goes live.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101010">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NOTCHLIVE">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta property="og:title" content="NOTCHLIVE — They live in your notch">
+<meta property="og:description" content="Small pixel creatures that live inside your phone's notch. They sleep in the dark and wake glowing when the screen is live.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://notchlive.xyz/">
+<meta property="og:image" content="https://notchlive.xyz/images/notchling-1-badge.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://notchlive.xyz/images/notchling-1-badge.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Georgia:ital@1&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -81,9 +96,33 @@
   .faq b{display:block;font-size:14px;margin-bottom:8px}
   .faq p{color:var(--mut);font-size:13px;line-height:1.7;margin:0}
   @media(max-width:700px){.steps,.prompts,.faq{grid-template-columns:1fr}}
+
+  /* --- NOTCHLIVE theme animations --- */
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 6px var(--glow,#ffc93c))}50%{filter:drop-shadow(0 0 18px var(--glow,#ffc93c))}}
+  @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+  @keyframes notchPulse{0%{box-shadow:0 0 0 0 rgba(255,45,45,.5)}70%{box-shadow:0 0 0 12px rgba(255,45,45,0)}100%{box-shadow:0 0 0 0 rgba(255,45,45,0)}}
+  @keyframes wakeIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .feature img{animation:floaty 5s ease-in-out infinite,glowPulse 3.5s ease-in-out infinite;--glow:#ffc93c}
+  .card img{animation:floaty 6s ease-in-out infinite,glowPulse 4s ease-in-out infinite;transition:transform .3s}
+  .card:nth-child(odd) img{animation-delay:.6s}
+  .card:hover img{transform:scale(1.06)}
+  .card.tier-common img{--glow:#c0c0c0}.card.tier-uncommon img{--glow:#4ade80}.card.tier-rare img{--glow:#60a5fa}.card.tier-epic img{--glow:#c084fc}.card.tier-legendary img{--glow:#f59e0b}.card.tier-mythic img{--glow:#f472b6}
+  .card.tier-common{border-top:2px solid #c0c0c0}.card.tier-uncommon{border-top:2px solid #4ade80}.card.tier-rare{border-top:2px solid #60a5fa}.card.tier-epic{border-top:2px solid #c084fc}.card.tier-legendary{border-top:2px solid #f59e0b}.card.tier-mythic{border-top:2px solid #f472b6}
+  .notchbar .pill{animation:notchPulse 2s infinite}
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .stars i{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+  main,header{position:relative;z-index:1}
+  .hero,.card{animation:riseIn .7s ease both}
+  .waketoggle{background:#111;color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:12px;margin-top:12px}
+  body.asleep .feature img,body.asleep .card img{animation:none;filter:brightness(.45) saturate(.6)}
+  body.asleep .notchbar .pill{animation:none;background:#222;color:#888}
+  body.asleep .notchbar .pill i{background:#888;animation:none}
 </style>
 </head>
 <body>
+<div class="stars" aria-hidden="true"></div>
 <header>
   <div class="logo">NOTCH<b>LIVE</b><small>notchlive &middot; BNB SMART CHAIN</small></div>
   <nav><a href="#mint">Mint</a><a href="#agent">Agent</a><a href="#works">Works</a><span class="badge">&#9679; PREVIEW</span></nav>
@@ -95,6 +134,7 @@
     <h1>They live<br>in your <em>notch.</em></h1>
     <p>Small creatures sleep inside your phone's notch, in the dark. The moment the screen goes live, they wake up glowing &mdash; eyes lit, horns catching the signal, watching from the black bar at the top of your world.</p>
     <div class="notchbar"><span class="pill"><i></i>LIVE</span></div>
+    <div><button class="waketoggle" onclick="toggleWake()" id="wakebtn">Tidurkan Notchlings</button><br><small style="color:var(--mut);font-size:12px">Mereka tidur di gelap, dan bangun bercahaya saat layar live.</small></div>
     </div><div>
     <div class="feature"><img src="images/notchling-1-badge.png" alt="Notchling 1 featured"><div><i>Notchling #1 &mdash; First Light</i><br><span style="font-family:monospace;font-size:12px;color:var(--mut)">01 / 40 &middot; ICE BLUE / PURPLE &middot; RED LIVE</span></div></div>
     <div class="thumbs"><img src="images/notchling-1-badge.png" alt="1"><img src="images/notchling-2-badge.png" alt="2"><img src="images/notchling-3-badge.png" alt="3"><img src="images/notchling-4-badge.png" alt="4"><img src="images/notchling-5-badge.png" alt="5"><img src="images/notchling-6-badge.png" alt="6"><img src="images/notchling-7-badge.png" alt="7"><img src="images/notchling-8-badge.png" alt="8"><img src="images/notchling-9-badge.png" alt="9"><img src="images/notchling-10-badge.png" alt="10"><img src="images/notchling-11.png" alt="11"><img src="images/notchling-12.png" alt="12"><img src="images/notchling-13.png" alt="13"><img src="images/notchling-14.png" alt="14"><img src="images/notchling-15.png" alt="15"><img src="images/notchling-16.png" alt="16"><img src="images/notchling-17.png" alt="17"><img src="images/notchling-18.png" alt="18"><img src="images/notchling-19.png" alt="19"><img src="images/notchling-20.png" alt="20"><img src="images/notchling-21.png" alt="21"><img src="images/notchling-22.png" alt="22"><img src="images/notchling-23.png" alt="23"><img src="images/notchling-24.png" alt="24"><img src="images/notchling-25.png" alt="25"><img src="images/notchling-26.png" alt="26"><img src="images/notchling-27.png" alt="27"><img src="images/notchling-28.png" alt="28"><img src="images/notchling-29.png" alt="29"><img src="images/notchling-30.png" alt="30"><img src="images/notchling-31.png" alt="31"><img src="images/notchling-32.png" alt="32"><img src="images/notchling-33.png" alt="33"><img src="images/notchling-34.png" alt="34"><img src="images/notchling-35.png" alt="35"><img src="images/notchling-36.png" alt="36"><img src="images/notchling-37.png" alt="37"><img src="images/notchling-38.png" alt="38"><img src="images/notchling-39.png" alt="39"><img src="images/notchling-40.png" alt="40"></div>
@@ -144,6 +184,12 @@
       <div class="promptcard"><h3>Prompt &mdash; Paid Mint</h3><code id="promptPaid"></code><button onclick="copyText('promptPaid')">COPY PROMPT</button></div>
     </div>
     <p class="secsub">The contract address in both prompts is the deployed NOTCHLIVE contract &mdash; still a placeholder here, to be filled after deployment. No separate payout address is included in either prompt. The agent only prepares transactions through a wallet you control &mdash; never share your seed phrase or private key. The prompt amounts follow your mint picks: free mint totals amount &times; 0.0001 BNB, paid mint amount &times; 0.001 BNB.</p>
+  </section>
+
+  <section id="install">
+    <h2>Install <em>as an app.</em></h2>
+    <p class="secsub">On Android Chrome: tap the three dots &gt; Install app (or Add to Home screen). The app icon will be Notchling #1 &mdash; First Light, not a grey placeholder, and it opens standalone like an app. This needs the site's manifest, app icons, and service worker, which are now included.</p>
+    <div class="feature" style="max-width:220px"><img src="icons/icon-512.png" alt="NOTCHLIVE app icon — Notchling 1"><div><i>App icon &mdash; Notchling #1</i><br><span style="font-family:monospace;font-size:12px;color:var(--mut)">512 &times; 512 &middot; MASKABLE READY</span></div></div>
   </section>
 
   <section id="faq">
@@ -229,7 +275,38 @@ function copyText(id){
   var t = document.getElementById(id).textContent;
   if (navigator.clipboard) { navigator.clipboard.writeText(t); }
 }
+function toggleWake(){
+  var asleep = document.body.classList.toggle('asleep');
+  var pill = document.querySelector('.notchbar .pill');
+  var btn = document.getElementById('wakebtn');
+  if (pill) pill.innerHTML = asleep ? '<i></i>SLEEP' : '<i></i>LIVE';
+  if (btn) btn.textContent = asleep ? 'Bangunkan Notchlings' : 'Tidurkan Notchlings';
+}
+(function(){
+  var stars = document.querySelector('.stars');
+  if (stars) {
+    for (var i = 0; i < 40; i++) {
+      var s = document.createElement('i');
+      s.style.left = Math.random()*100 + '%';
+      s.style.top = Math.random()*100 + '%';
+      s.style.animationDelay = (Math.random()*3) + 's';
+      s.style.animationDuration = (2 + Math.random()*3) + 's';
+      stars.appendChild(s);
+    }
+  }
+  document.querySelectorAll('.card').forEach(function(card){
+    var tier = card.querySelector('.tier');
+    if (tier) card.classList.add('tier-' + tier.textContent.trim().toLowerCase());
+  });
+})();
 updateMint();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
