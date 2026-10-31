@@ -26,7 +26,8 @@ input,select{width:100%;box-sizing:border-box;background:#000;color:#ece7db;bord
 <body>
 <main>
 <h1>Deploy <em>NOTCHLIVE.</em></h1>
-<p class="mut">Tidak perlu Remix, tidak perlu copy-paste kontrak. Di halaman ini saja: hubungkan wallet owner, pilih jaringan, tekan Deploy, lalu <b>tinggal sign di wallet</b>. Kontrak <b>belum ter-deploy</b> dan mint <b>belum dibuka</b> sampai owner menandatanganinya nanti.</p>
+<p class="mut">Tidak perlu Remix, tidak perlu copy-paste kontrak. Di halaman ini saja: hubungkan wallet owner, pilih jaringan, tekan Deploy, lalu <b>tinggal sign di wallet</b>.</p>
+<p class="warn"><b>Versi Mainnet:</b> deploy ke BNB Mainnet (56) dengan BNB asli. <b>Mint TIDAK langsung dibuka.</b> Di kontrak, <code>mintEnabled = false</code> sejak deploy, jadi tidak ada yang bisa mint sampai wallet owner sendiri menandatangani <code>setMintEnabled(true)</code> di langkah 3 nanti.</p>
 
 <div class="card">
 <h2>1. Hubungkan wallet owner</h2>
@@ -40,18 +41,20 @@ input,select{width:100%;box-sizing:border-box;background:#000;color:#ece7db;bord
 <h2>2. Pilih jaringan, lalu Deploy</h2>
 <label for="network">Jaringan</label>
 <select id="network">
-<option value="testnet" selected>BNB Testnet (97) — untuk latihan, pakai tBNB</option>
-<option value="mainnet">BNB Mainnet (56) — deploy final, pakai BNB asli</option>
+<option value="mainnet" selected>BNB Mainnet (56) — deploy final, pakai BNB asli</option>
+<option value="testnet">BNB Testnet (97) — untuk latihan, pakai tBNB</option>
 </select>
-<p class="mut">Saran: coba dulu di Testnet. Kalau sudah yakin, baru deploy ulang di Mainnet. Deploy hanya bayar gas, bukan harga mint.</p>
-<button id="deployBtn" onclick="deployContract()">Deploy NOTCHLIVE — Tinggal Sign</button>
+<p class="mut">Mainnet sudah jadi pilihan utama. Testnet tetap ada kalau mau latihan dulu. Deploy hanya bayar gas, bukan harga mint — dan deploy ini <b>tidak membuka mint</b>.</p>
+<button id="deployBtn" onclick="deployContract()">Deploy Mainnet NOTCHLIVE — Tinggal Sign</button>
 <p id="deployStatus" class="mut"></p>
 <div id="deployResult" class="result">
 <p class="ok"><b>Kontrak berhasil di-deploy!</b></p>
 <p>Alamat kontrak: <code id="contractAddress"></code> <button onclick="copyAddress()">Salin Alamat</button></p>
 <p>Transaksi deploy: <code id="deployTx"></code></p>
 <p><a id="scanLink" href="#" target="_blank" rel="noopener">Lihat di BscScan</a></p>
-<p class="mut">Simpan alamat ini. Setelah alamat ada, masukkan ke halaman mint di notchlive.xyz dan ke prompt AI Agent, menggantikan placeholder yang sekarang. Mint masih tertutup — lihat langkah 3.</p>
+<p>Status mint dari kontrak (dibaca langsung on-chain): <code id="mintStatus">—</code></p>
+<p>Owner kontrak: <code id="ownerAddress">—</code></p>
+<p class="mut">Simpan alamat ini. Setelah alamat ada, masukkan ke halaman mint di notchlive.xyz dan ke prompt AI Agent, menggantikan placeholder yang sekarang. Mint masih tertutup — hanya bisa dibuka lewat sign owner di langkah 3.</p>
 </div>
 </div>
 
@@ -133,7 +136,16 @@ async function deployContract() {
     const link = document.getElementById("scanLink");
     link.href = net.scan + "/address/" + address;
     document.getElementById("deployResult").style.display = "block";
-    status.innerHTML = "<span class='ok'>Selesai di " + net.name + ". Mint masih tertutup sampai kamu sign Buka Mint di langkah 3.</span>";
+    try {
+      const check = new ethers.Contract(address, ABI, provider);
+      const enabled = await check.mintEnabled();
+      const ownerAddr = await check.owner();
+      document.getElementById("mintStatus").textContent = enabled ? "DIBUKA" : "TERTUTUP — menunggu tanda tangan owner";
+      document.getElementById("ownerAddress").textContent = ownerAddr;
+    } catch (e) {
+      document.getElementById("mintStatus").textContent = "TERTUTUP (mintEnabled=false di kontrak, dibuka hanya lewat sign owner)";
+    }
+    status.innerHTML = "<span class='ok'>Selesai di " + net.name + ". Mint TIDAK langsung dibuka — hanya owner yang bisa membukanya lewat sign di langkah 3.</span>";
   } catch (err) {
     status.textContent = "Deploy dibatalkan atau gagal: " + (err && (err.shortMessage || err.message) ? (err.shortMessage || err.message) : "coba lagi.");
   } finally { btn.disabled = false; }
