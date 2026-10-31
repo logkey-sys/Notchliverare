@@ -1,0 +1,28 @@
+name: Extract NOTCHLIVE collection
+on:
+  push:
+    paths:
+      - 'collection-zips-github/**'
+      - '.github/workflows/extract-collection.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract collection zips
+        run: |
+          mkdir -p collection-images collection-metadata
+          for z in collection-zips-github/*.zip; do unzip -o "$z" -d .; done
+          ls collection-images | wc -l
+          ls collection-metadata | wc -l
+      - name: Commit extracted collection
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          touch .nojekyll
+          git add .nojekyll collection-images collection-metadata
+          git diff --cached --quiet || git commit -m "Extract NOTCHLIVE collection images and metadata"
+          git push
