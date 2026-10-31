@@ -61,6 +61,26 @@
   .tier{color:var(--gold);font-family:'Press Start 2P',monospace;font-size:9px}
   footer{border-top:1px solid var(--line);margin-top:60px;padding:22px 0;color:var(--mut);font-size:12px;line-height:1.8}
   @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr 1fr}.hero-grid{grid-template-columns:1fr}nav a{margin-left:10px}}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .step{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .step h3{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold);margin:0 0 10px}
+  .step p{color:var(--mut);font-size:13px;line-height:1.7;margin:0}
+  .phasebox{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px;margin-top:14px}
+  .phasebox label{display:block;color:var(--mut);font-size:12px;letter-spacing:1px;margin:12px 0 6px}
+  .phasebox select,.phasebox input{width:100%;background:#000;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:11px;font-size:14px}
+  .mintbtn{background:var(--gold);color:#000;border:0;border-radius:8px;padding:13px 20px;font-weight:700;cursor:not-allowed;opacity:.85;margin-top:14px}
+  .warn{border:1px dashed #a66;background:#1a0f0f;border-radius:10px;padding:12px;color:#f0c0c0;font-size:13px;line-height:1.7;margin-top:14px}
+  .prompts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .promptcard{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .promptcard h3{font-family:'Press Start 2P',monospace;font-size:11px;margin:0 0 10px}
+  .promptcard code{display:block;background:#000;border:1px solid var(--line);border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-all;font-size:12px;line-height:1.7;color:#cfe3ff;min-height:180px}
+  .promptcard button{background:var(--gold);color:#000;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;margin-top:10px}
+  .faq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .faq div{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+  .faq b{display:block;font-size:14px;margin-bottom:8px}
+  .faq p{color:var(--mut);font-size:13px;line-height:1.7;margin:0}
+  @media(max-width:700px){.steps,.prompts,.faq{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -82,25 +102,58 @@
   </section>
 
   <section id="mint">
-    <h2>Mint <em>progress.</em></h2>
+    <h2>Mint <em>steps.</em></h2>
     <div class="bar"><i></i></div>
-    <p class="secsub">Mint not open &mdash; 0 of 11,111. Bar stays empty until a real contract exists.</p>
-    <p class="secsub">Preview version. The mint contract is not deployed yet, so no mint is open and no number below is a live on-chain count. What you see here are the 40 sample works made for the series.</p>
+    <p class="secsub">Mint not open yet &mdash; 0 of 11,111. The layout below follows the Cappybara-style flow you sent, adapted to NOTCHLIVE. Nothing here mints or charges yet, because the NOTCHLIVE contract is not deployed.</p>
+    <div class="steps">
+      <div class="step"><h3>STEP 1</h3><p>Click Connect Wallet and approve the connection in your wallet (OKX, MetaMask, or any other EVM wallet) on the BNB Chain network. Wallets holding a Binance Agent ID work too &mdash; this page detects it after you connect.</p></div>
+      <div class="step"><h3>STEP 2</h3><p>Pick how you mint, from the same full pool: Free Mint (0.0001 BNB fee) or Paid Mint (0.001 BNB per NFT), then set the mint amount. No tokens are reserved for one phase or the other.</p></div>
+      <div class="step"><h3>STEP 3</h3><p>Click the mint button and confirm the transaction in your wallet. Your Notchling is recorded under your wallet right away &mdash; as a random unminted token, not in gallery order.</p></div>
+    </div>
+    <div class="phasebox">
+      <label>Phase</label>
+      <select id="phase" onchange="updateMint()">
+        <option value="free">Free Mint &mdash; NFT free, 0.0001 BNB fee per mint</option>
+        <option value="paid">Paid Mint &mdash; 0.001 BNB per NFT</option>
+      </select>
+      <label>Mint amount</label>
+      <input id="amount" type="number" min="1" max="10" value="1" onchange="updateMint()">
+      <p id="total" style="color:var(--mut);font-size:13px;line-height:1.7">Total: 1 &times; 0.0001 BNB = 0.0001 BNB, plus BNB Chain gas.</p>
+      <button class="mintbtn" disabled>Connect Wallet to Mint &mdash; mint not open yet</button>
+      <div class="warn"><b>Draft only.</b> Contract address is still a placeholder. No separate payout address is shown in this mint page or in the AI Agent prompts. The mint button stays disabled until a real NOTCHLIVE contract is deployed and its address is put in this page.</div>
+    </div>
     <div class="stats">
       <div class="stat"><span>Status</span><b>Preview</b><small>Contract not deployed yet</small></div>
-      <div class="stat"><span>Supply</span><b>11,111</b><small>Planned total supply</small></div>
+      <div class="stat"><span>Supply</span><b>11,111</b><small>Planned total supply &mdash; NOT 10,000</small></div>
       <div class="stat"><span>Tiers</span><b>6</b><small>Common to Mythic</small></div>
       <div class="stat"><span>Chain</span><b>BNB 56</b><small>OKX wallet first</small></div>
     </div>
+    <p class="secsub"><b>No split &mdash; locked by owner:</b> The full 11,111 is one pool. There is no free-token range and no paid-token range. At mint time you pick Free Mint (0.0001 BNB fee) or Paid Mint (0.001 BNB per NFT), and either way you get a random unminted token from the same 11,111 pool, until it sells out.</p>
   </section>
 
   <section id="agent">
-    <h2>01 &middot; For your <em>agent.</em></h2>
-    <p class="secsub">One line. Your agent does the rest. This prompt is a draft &mdash; it only becomes usable once the mint contract is deployed and its address replaces the placeholder below.</p>
-    <div class="agentbox">
-      <code id="agentprompt">Read the NOTCHLIVE mint guide and use my Binance Agentic Wallet to mint my Notchling from contract [CONTRACT ADDRESS - NOT DEPLOYED YET] on BNB Smart Chain.</code>
-      <button onclick="copyPrompt()">Copy prompt</button>
-      <small id="copymsg">No wallet connection is needed to read this page. Minting, fees, and supply will be confirmed from the contract itself once it exists &mdash; never from this preview text.</small>
+    <h2>Mint via <em>AI Agent.</em></h2>
+    <p class="secsub">Don&apos;t want to connect a wallet manually? Paste your wallet address below &mdash; both prompts fill in automatically &mdash; then copy the prompt and send it to your AI agent. There is one prompt for the free mint and one for the paid mint, and the amount in each prompt follows the amount you picked in the mint box above. Binance Agent ID wallets work too.</p>
+    <div class="phasebox">
+      <label>YOUR WALLET ADDRESS &mdash; PASTE IT HERE</label>
+      <input id="wallet" type="text" placeholder="0x... paste your BNB Chain wallet address" oninput="updateMint()">
+      <p style="color:var(--mut);font-size:12px;line-height:1.7">Paste your wallet address and both prompts below fill in automatically &mdash; then click COPY PROMPT. Connecting your wallet in the Mint section above also fills this field once wallet connection is enabled. Never share your seed phrase or private key.</p>
+    </div>
+    <div class="prompts">
+      <div class="promptcard"><h3>Prompt &mdash; Free Mint</h3><code id="promptFree"></code><button onclick="copyText('promptFree')">COPY PROMPT</button></div>
+      <div class="promptcard"><h3>Prompt &mdash; Paid Mint</h3><code id="promptPaid"></code><button onclick="copyText('promptPaid')">COPY PROMPT</button></div>
+    </div>
+    <p class="secsub">The contract address in both prompts is the deployed NOTCHLIVE contract &mdash; still a placeholder here, to be filled after deployment. No separate payout address is included in either prompt. The agent only prepares transactions through a wallet you control &mdash; never share your seed phrase or private key. The prompt amounts follow your mint picks: free mint totals amount &times; 0.0001 BNB, paid mint amount &times; 0.001 BNB.</p>
+  </section>
+
+  <section id="faq">
+    <h2>Frequently <em>Asked Questions.</em></h2>
+    <div class="faq">
+      <div><b>What is the total NOTCHLIVE supply?</b><p>Total supply is 11,111 NFTs, in one pool with no free/paid split. Free and paid mints both draw random unminted tokens from the same pool, not gallery order, and the web gallery stays at only the 40 sample works.</p></div>
+      <div><b>Why does the free mint have a fee?</b><p>The NFT itself is free (0 BNB). You only pay a 0.0001 BNB mint fee per mint, which goes to the owner&apos;s wallet as a creator fee.</p></div>
+      <div><b>How much is the paid mint?</b><p>0.001 BNB per NFT. The total sent is mint amount &times; 0.001 BNB, plus BNB Chain gas.</p></div>
+      <div><b>Can I mint without connecting a wallet manually?</b><p>Yes. Paste your wallet address in the AI Agent section &mdash; both prompts fill in automatically &mdash; then copy the prompt and send it to your AI agent with access to a BNB Chain wallet.</p></div>
+      <div><b>Can I mint with a Binance Agent ID?</b><p>Yes. If your wallet holds a Binance Agent ID, you can mint with it, in the manual flow and in the AI Agent flow.</p></div>
     </div>
   </section>
 
@@ -154,16 +207,29 @@
   <footer>
     <div style="font-family:Georgia,serif;font-size:clamp(48px,10vw,110px);line-height:1;color:var(--txt)">NOTCHLIVE</div>
     NOTCHLIVE &mdash; they live in your notch.<br>
-    Preview site. Domain extension for notchlive still to be confirmed, and the mint contract is not deployed yet, so nothing on this page mints, charges, or counts a live supply.<br>
+    Draft mint page. Domain extension for notchlive still to be confirmed, and the mint contract is not deployed yet, so nothing on this page mints, charges, or counts a live supply. Contract address is a placeholder until confirmed. No separate payout address is used.<br>
     PREVIEW &middot; NOT AFFILIATED WITH BINANCE &middot; BNB SMART CHAIN &middot; 56
   </footer>
 </main>
 <script>
-function copyPrompt(){
-  var t = document.getElementById('agentprompt').textContent;
-  if (navigator.clipboard) { navigator.clipboard.writeText(t).then(function(){ document.getElementById('copymsg').textContent = 'Prompt copied.'; }); }
-  else { document.getElementById('copymsg').textContent = 'Copy the prompt text above manually.'; }
+function fmt(n){ return (Math.round(n*10000)/10000).toFixed(4); }
+function updateMint(){
+  var phase = document.getElementById('phase').value;
+  var amt = parseInt(document.getElementById('amount').value || '1', 10);
+  if (amt < 1) amt = 1;
+  var wallet = (document.getElementById('wallet').value || '[PASTE YOUR WALLET ADDRESS]').trim() || '[PASTE YOUR WALLET ADDRESS]';
+  var price = phase === 'free' ? 0.0001 : 0.001;
+  document.getElementById('total').textContent = 'Total: ' + amt + ' x ' + price.toFixed(4) + ' BNB = ' + fmt(amt*price) + ' BNB, plus BNB Chain gas.';
+  var callFree = 'Call mintFree(' + amt + ') with a value of 0.0001 BNB x ' + amt + ' = ' + fmt(amt*0.0001) + ' BNB.';
+  var callPaid = 'Call mintPaid(' + amt + ') with a value of 0.001 BNB x ' + amt + ' = ' + fmt(amt*0.001) + ' BNB.';
+  document.getElementById('promptFree').textContent = 'Mint ' + amt + ' Notchling NFTs (free mint) on BNB Chain (chain ID 56). Contract: [NOTCHLIVE CONTRACT - NOT DEPLOYED YET] My wallet: ' + wallet + ' A Binance Agent ID wallet can also be used for this mint. ' + callFree + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
+  document.getElementById('promptPaid').textContent = 'Mint ' + amt + ' Notchling NFTs (paid mint) on BNB Chain (chain ID 56). Contract: [NOTCHLIVE CONTRACT - NOT DEPLOYED YET] My wallet: ' + wallet + ' A Binance Agent ID wallet can also be used for this mint. ' + callPaid + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
 }
+function copyText(id){
+  var t = document.getElementById(id).textContent;
+  if (navigator.clipboard) { navigator.clipboard.writeText(t); }
+}
+updateMint();
 </script>
 </body>
 </html>
