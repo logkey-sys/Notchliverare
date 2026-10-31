@@ -148,6 +148,7 @@
   <section id="mint">
     <h2>Mint <em>steps.</em></h2>
     <div class="bar"><i></i></div>
+    <p id="supplyLine" style="color:var(--mut);font-size:13px;line-height:1.7">Loading remaining supply...</p>
     <p class="secsub">Mint not open yet &mdash; 0 of 11,111. Pick a phase, set your amount, and confirm in your wallet when mint opens. Nothing here mints or charges yet. Contract deployed and verified on BNB Mainnet 56: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. Mint stays closed until the owner signs setMintEnabled(true).</p>
     <div class="steps">
       <div class="step"><h3>STEP 1</h3><p>Click Connect Wallet and approve the connection in your wallet (OKX, MetaMask, or any other EVM wallet) on the BNB Chain network. Wallets holding a Binance Agent ID work too &mdash; this page detects it after you connect.</p></div>
@@ -173,7 +174,6 @@
       <div class="stat"><span>Tiers</span><b>6</b><small>Common to Mythic</small></div>
       <div class="stat"><span>Chain</span><b>BNB</b><small>BNB Smart Chain &middot; 56 &middot; OKX wallet first</small></div>
     </div>
-    <p class="secsub"><b>No split &mdash; locked by owner:</b> The full 11,111 is one pool. There is no free-token range and no paid-token range. At mint time you pick Free Mint (0.0001 BNB fee) or Paid Mint (0.001 BNB per NFT), and either way you get a random unminted token from the same 11,111 pool, until it sells out.</p>
   </section>
 
   <section id="agent">
@@ -244,9 +244,30 @@ async function checkMintStatus() {
     __mintEnabled = await c.mintEnabled();
     var minted = await c.totalMinted();
     setMintStatus(__mintEnabled ? ('Mint is OPEN. Minted so far: ' + minted.toString() + ' / 11,111.') : ('Mint is still CLOSED. Minted so far: ' + minted.toString() + ' / 11,111. It opens only when the owner signs setMintEnabled(true).'));
+    updateSupplyUI(minted, __mintEnabled);
   } catch (e) { setMintStatus('Could not read mint status. Make sure your wallet is on BNB Mainnet (56) and try again.'); }
   mintButtonLabel();
 }
+
+function updateSupplyUI(minted, enabled) {
+  var bar = document.querySelector('.bar i'); if (bar) bar.style.width = (Number(minted) / 11111 * 100).toFixed(2) + '%';
+  var el = document.getElementById('supplyLine'); if (!el) return;
+  var remaining = 11111 - Number(minted);
+  el.textContent = 'Minted: ' + minted.toString() + ' / 11,111 · Remaining: ' + remaining.toLocaleString('en-US') + (enabled ? ' · Mint is OPEN' : ' · Mint is closed');
+}
+async function loadSupply() {
+  try {
+    if (typeof ethers === 'undefined') { return; }
+    var provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, provider);
+    var minted = await c.totalMinted();
+    __mintEnabled = await c.mintEnabled();
+    updateSupplyUI(minted, __mintEnabled);
+  } catch (e) {
+    var el = document.getElementById('supplyLine'); if (el) el.textContent = 'Could not load remaining supply. Please refresh and try again.';
+  }
+}
+
 async function handleMint() {
   if (typeof ethers === 'undefined') { setMintStatus('Wallet library failed to load. Check your internet connection and refresh.'); return; }
   var e = mintEth();
@@ -315,6 +336,7 @@ function toggleWake(){
   });
 })();
 updateMint();
+loadSupply();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
