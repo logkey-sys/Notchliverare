@@ -68,6 +68,8 @@ input,select{width:100%;box-sizing:border-box;background:#000;color:#ece7db;bord
 <button class="secondary" onclick="setBaseURI()">Set BaseURI — Sign di Wallet</button>
 <button class="secondary" onclick="setMint(true)">Buka Mint — Sign di Wallet</button>
 <button onclick="setMint(false)">Tutup Mint — Sign di Wallet</button>
+<button class="secondary" onclick="checkDeployedContract()">Cek Kontrak — Baca Saja, Tanpa Sign</button>
+<p id="checkResult" class="mut"></p>
 <p id="ownerStatus" class="mut"></p>
 <p class="mut">Harga yang dikunci di kontrak: free mint fee 0.0001 BNB, paid mint 0.001 BNB per NFT, maks 10 per transaksi, total supply 11.111, satu pool tanpa split, tanpa treasury. Dana mint tinggal di kontrak sampai owner withdraw.</p>
 <p class="mut">Masih mau cara lama? <a href="https://remix.ethereum.org/" target="_blank" rel="noopener">Buka Remix</a> dan deploy file <code>NOTCHLIVE.sol</code> dari repo ini.</p>
@@ -173,6 +175,22 @@ async function setMint(enabled) {
   const c = await getOwnerContract(); if (!c) return;
   try { status.textContent = "Silakan sign " + (enabled ? "Buka Mint" : "Tutup Mint") + " di wallet..."; const tx = await c.setMintEnabled(enabled); await tx.wait(); status.innerHTML = "<span class='ok'>Mint " + (enabled ? "DIBUKA" : "DITUTUP") + ". Tx: " + tx.hash + "</span>"; }
   catch (err) { status.textContent = "Dibatalkan atau gagal: " + (err && (err.shortMessage || err.message) || "coba lagi."); }
+}
+async function checkDeployedContract() {
+  const out = document.getElementById("checkResult");
+  const address = document.getElementById("deployedAddress").value.trim();
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { out.textContent = "Isi alamat kontrak yang valid dulu di langkah 3."; return; }
+  if (!provider) { out.textContent = "Hubungkan wallet dulu (langkah 1). Cek ini hanya baca, tidak meminta sign."; return; }
+  try {
+    out.textContent = "Membaca kontrak on-chain... (pastikan wallet di BNB Mainnet 56)";
+    const c = new ethers.Contract(address, ABI, provider);
+    const [name, symbol, ownerAddr, enabled, maxSupply, minted, freeFee, paidPrice, maxPerTx] = await Promise.all([c.name(), c.symbol(), c.owner(), c.mintEnabled(), c.MAX_SUPPLY(), c.totalMinted(), c.FREE_FEE(), c.PAID_PRICE(), c.MAX_PER_TX()]);
+    const expectedOwner = "0x6828aBa60E9EE9b9E3E3889714102F5954b093A3";
+    const match = name === "NOTCHLIVE" && symbol === "NOTCH" && maxSupply.toString() === "11111" && ownerAddr.toLowerCase() === expectedOwner.toLowerCase();
+    out.innerHTML = "Nama: " + name + "<br>Symbol: " + symbol + "<br>Owner: " + ownerAddr + "<br>MAX_SUPPLY: " + maxSupply.toString() + "<br>totalMinted: " + minted.toString() + "<br>mintEnabled: " + (enabled ? "true — MINT TERBUKA" : "false — mint masih tertutup") + "<br>Free fee: " + freeFee.toString() + " wei (harapan 100000000000000 = 0.0001 BNB)" + "<br>Paid price: " + paidPrice.toString() + " wei (harapan 1000000000000000 = 0.001 BNB)" + "<br>MAX_PER_TX: " + maxPerTx.toString() + "<br>" + (match ? "<span class='ok'><b>Cocok dengan kontrak NOTCHLIVE yang dikunci.</b> Baru setelah ini alamat boleh dicatat sebagai kontrak resmi dan dimasukkan ke halaman mint.</span>" : "<b>PERINGATAN: tidak cocok dengan spec NOTCHLIVE / owner deployer yang diharapkan.</b> Jangan pakai alamat ini di halaman mint sampai dicek lebih lanjut.");
+  } catch (err) {
+    out.textContent = "Gagal membaca kontrak: " + (err && (err.shortMessage || err.message) || "coba lagi.") + " Pastikan alamatnya kontrak di chain yang sedang aktif di wallet (BNB Mainnet 56).";
+  }
 }
 </script>
 </body>
