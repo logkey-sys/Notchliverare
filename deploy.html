@@ -181,15 +181,26 @@ async function checkDeployedContract() {
   const address = document.getElementById("deployedAddress").value.trim();
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { out.textContent = "Isi alamat kontrak yang valid dulu di langkah 3."; return; }
   if (!provider) { out.textContent = "Hubungkan wallet dulu (langkah 1). Cek ini hanya baca, tidak meminta sign."; return; }
+  out.textContent = "Membaca kontrak on-chain...";
   try {
-    out.textContent = "Membaca kontrak on-chain... (pastikan wallet di BNB Mainnet 56)";
+    const net = await provider.getNetwork();
+    const code = await provider.getCode(address);
+    let html = "Chain wallet saat ini: " + net.chainId + (net.chainId.toString() === "56" ? " (BNB Mainnet, benar)" : " (BUKAN 56 — pindah ke BNB Mainnet dulu)") + "<br>";
+    html += "Kode kontrak di chain ini: " + (code === "0x" ? "TIDAK ADA (0x) — alamat ini bukan kontrak di chain ini" : (code.length - 2) / 2 + " byte") + "<br>";
+    if (code === "0x") { out.innerHTML = html + "<b>Berhenti di sini:</b> di chain wallet saat ini tidak ada kontrak di alamat itu. Itulah penyebab umum error 'could not decode result data'. Pindah wallet ke BNB Mainnet 56, hubungkan ulang, lalu tekan Cek Kontrak lagi."; return; }
     const c = new ethers.Contract(address, ABI, provider);
-    const [name, symbol, ownerAddr, enabled, maxSupply, minted, freeFee, paidPrice, maxPerTx] = await Promise.all([c.name(), c.symbol(), c.owner(), c.mintEnabled(), c.MAX_SUPPLY(), c.totalMinted(), c.FREE_FEE(), c.PAID_PRICE(), c.MAX_PER_TX()]);
+    const tests = [["name", () => c.name()], ["symbol", () => c.symbol()], ["owner", () => c.owner()], ["mintEnabled", () => c.mintEnabled()], ["MAX_SUPPLY", () => c.MAX_SUPPLY()], ["totalMinted", () => c.totalMinted()], ["FREE_FEE", () => c.FREE_FEE()], ["PAID_PRICE", () => c.PAID_PRICE()], ["MAX_PER_TX", () => c.MAX_PER_TX()]];
+    const vals = {};
+    for (const [label, fn] of tests) {
+      try { const v = await fn(); vals[label] = (typeof v === "bigint") ? v.toString() : String(v); html += label + ": OK = " + vals[label] + "<br>"; }
+      catch (e) { vals[label] = null; html += label + ": GAGAL (" + (e && (e.shortMessage || e.message) || "error") + ")<br>"; }
+    }
     const expectedOwner = "0x6828aBa60E9EE9b9E3E3889714102F5954b093A3";
-    const match = name === "NOTCHLIVE" && symbol === "NOTCH" && maxSupply.toString() === "11111" && ownerAddr.toLowerCase() === expectedOwner.toLowerCase();
-    out.innerHTML = "Nama: " + name + "<br>Symbol: " + symbol + "<br>Owner: " + ownerAddr + "<br>MAX_SUPPLY: " + maxSupply.toString() + "<br>totalMinted: " + minted.toString() + "<br>mintEnabled: " + (enabled ? "true — MINT TERBUKA" : "false — mint masih tertutup") + "<br>Free fee: " + freeFee.toString() + " wei (harapan 100000000000000 = 0.0001 BNB)" + "<br>Paid price: " + paidPrice.toString() + " wei (harapan 1000000000000000 = 0.001 BNB)" + "<br>MAX_PER_TX: " + maxPerTx.toString() + "<br>" + (match ? "<span class='ok'><b>Cocok dengan kontrak NOTCHLIVE yang dikunci.</b> Baru setelah ini alamat boleh dicatat sebagai kontrak resmi dan dimasukkan ke halaman mint.</span>" : "<b>PERINGATAN: tidak cocok dengan spec NOTCHLIVE / owner deployer yang diharapkan.</b> Jangan pakai alamat ini di halaman mint sampai dicek lebih lanjut.");
+    const match = vals.name === "NOTCHLIVE" && vals.symbol === "NOTCH" && vals.MAX_SUPPLY === "11111" && vals.owner && vals.owner.toLowerCase() === expectedOwner.toLowerCase();
+    html += match ? "<span class='ok'><b>Cocok dengan kontrak NOTCHLIVE yang dikunci.</b> Baru setelah ini alamat boleh dicatat sebagai kontrak resmi dan dimasukkan ke halaman mint.</span>" : "<b>PERINGATAN: belum cocok / ada fungsi yang gagal.</b> Kalau ada fungsi yang GAGAL di atas, kontrak di alamat itu kemungkinan bukan NOTCHLIVE dengan ABI ini, atau wallet masih di chain yang salah. Jangan pakai alamat ini di halaman mint sampai semua fungsi kunci OK.";
+    out.innerHTML = html;
   } catch (err) {
-    out.textContent = "Gagal membaca kontrak: " + (err && (err.shortMessage || err.message) || "coba lagi.") + " Pastikan alamatnya kontrak di chain yang sedang aktif di wallet (BNB Mainnet 56).";
+    out.textContent = "Gagal membaca kontrak: " + (err && (err.shortMessage || err.message) || "coba lagi.") + " Pastikan wallet di BNB Mainnet 56 dan alamatnya benar.";
   }
 }
 </script>
