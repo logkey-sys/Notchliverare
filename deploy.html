@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOTCHLIVE — Link Deploy</title>
+<style>
+body{margin:0;background:#101010;color:#ece7db;font-family:Inter,system-ui,sans-serif;padding:24px;line-height:1.7}
+main{max-width:720px;margin:0 auto}
+h1{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:42px}
+h1 em{color:#ff2d2d}
+.card{border:1px solid #2a2a2a;background:#161616;border-radius:12px;padding:18px;margin:16px 0}
+a.btn{display:inline-block;background:#ffc93c;color:#000;border-radius:8px;padding:12px 20px;font-weight:700;text-decoration:none;margin-top:10px}
+button{background:#c8f542;color:#000;border:0;border-radius:8px;padding:11px 18px;font-weight:700;cursor:pointer}
+code{background:#000;border:1px solid #2a2a2a;border-radius:6px;padding:2px 6px;word-break:break-all}
+.warn{border:1px dashed #a66;background:#1a0f0f;border-radius:10px;padding:14px}
+.mut{color:#9a9ab0}
+</style>
+</head>
+<body>
+<main>
+<h1>Deploy <em>NOTCHLIVE.</em></h1>
+<p class="mut">Link deploy ini hanya menyiapkan deploy. Kontrak <b>belum ter-deploy</b> dan mint <b>belum dibuka</b>. Mint baru bisa jalan nanti, setelah wallet owner menandatangani transaksi pembuka mint.</p>
+
+<div class="card">
+<h2>1. Hubungkan wallet owner</h2>
+<p>Gunakan wallet owner di BNB Smart Chain (chain ID 56). Untuk latihan, pakai dulu BNB Testnet. Wallet yang men-deploy otomatis jadi owner kontrak.</p>
+<button onclick="connectWallet()">Connect Wallet Owner</button>
+<p id="walletinfo" class="mut">Wallet belum terhubung.</p>
+<p class="warn"><b>Jangan pernah</b> membagikan seed phrase atau private key ke siapa pun, termasuk ke halaman ini. Halaman ini hanya meminta tanda tangan transaksi di wallet kamu sendiri.</p>
+</div>
+
+<div class="card">
+<h2>2. Deploy lewat Remix</h2>
+<p>Salin isi file <code>NOTCHLIVE.sol</code> ke Remix, compile dengan Solidity 0.8.20, lalu Deploy dengan wallet owner yang sudah terhubung. Remix adalah cara deploy paling aman tanpa menyerahkan kunci ke pihak lain.</p>
+<a class="btn" href="https://remix.ethereum.org/" target="_blank" rel="noopener">Buka Remix untuk Deploy</a>
+<p class="mut">Di Remix: buat file NOTCHLIVE.sol, paste kontrak, install/import OpenZeppelin, compile, pilih Injected Provider, pastikan network BNB Chain 56 (atau Testnet dulu), lalu Deploy. Simpan alamat kontrak yang muncul.</p>
+</div>
+
+<div class="card">
+<h2>3. Mint nanti, saat ditandatangani wallet owner</h2>
+<p>Setelah deploy, mint masih <b>tertutup</b> karena <code>mintEnabled = false</code>. Tidak ada yang bisa mint, gratis maupun berbayar, sampai owner menandatangani:</p>
+<p><code>setMintEnabled(true)</code> — hanya bisa dipanggil oleh owner, dari wallet owner.</p>
+<p>Urutan yang benar: (1) upload IPFS dulu, (2) owner panggil <code>setBaseURI("ipfs://&lt;CID&gt;/")</code>, (3) owner panggil <code>setMintEnabled(true)</code>, (4) baru setelah itu <code>mintFree</code> dan <code>mintPaid</code> bisa dipanggil publik.</p>
+<p class="mut">Harga yang dikunci di kontrak: free mint fee 0.0001 BNB, paid mint 0.001 BNB per NFT, maks 10 per transaksi, total supply 11.111, satu pool tanpa split, tanpa treasury. Hasil mint dan penarikan dana (withdraw) hanya ke owner, karena tidak ada alamat treasury.</p>
+</div>
+
+<div class="card">
+<h2>Setelah deploy, isi di sini</h2>
+<p>Alamat kontrak: <code>[BELUM DEPLOY]</code><br>
+BaseURI IPFS: <code>[BELUM UPLOAD IPFS]</code><br>
+Status mint: <code>Tertutup — menunggu tanda tangan owner</code></p>
+<p class="mut">Setelah alamat kontrak ada, masukkan ke halaman mint di notchlive.xyz dan ke prompt AI Agent, menggantikan placeholder yang sekarang.</p>
+</div>
+</main>
+<script>
+async function connectWallet(){
+  var info = document.getElementById('walletinfo');
+  if (!window.ethereum) { info.textContent = 'Wallet tidak ditemukan. Instal MetaMask atau OKX Wallet dulu, lalu refresh halaman ini.'; return; }
+  try {
+    var accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+    var chainId = await window.ethereum.request({method: 'eth_chainId'});
+    info.textContent = 'Terhubung: ' + accounts[0] + ' | Chain: ' + chainId + ' (BNB Mainnet = 0x38, Testnet = 0x61). Pastikan ini wallet owner sebelum deploy.';
+  } catch(e) {
+    info.textContent = 'Koneksi wallet dibatalkan atau gagal. Coba lagi.';
+  }
+}
+</script>
+</body>
+</html>
