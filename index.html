@@ -123,6 +123,7 @@
   @media(max-width:900px){.steps,.prompts,.faq{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}header{flex-wrap:wrap;gap:10px}nav a{margin-left:10px}}
   @media(max-width:480px){.stats{grid-template-columns:1fr}.step p,.phasebox select,.phasebox input{font-size:15px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
 </head>
 <body>
 <div class="stars" aria-hidden="true"></div>
@@ -137,7 +138,7 @@
     <h1>They live<br>in your <em>notch.</em></h1>
     <p>Small creatures sleep inside your phone's notch, in the dark. The moment the screen goes live, they wake up glowing &mdash; eyes lit, horns catching the signal, watching from the black bar at the top of your world.</p>
     <div class="notchbar"><span class="pill"><i></i>LIVE</span></div>
-    <div><button class="waketoggle" onclick="toggleWake()" id="wakebtn">Tidurkan Notchlings</button><br><small style="color:var(--mut);font-size:12px">Mereka tidur di gelap, dan bangun bercahaya saat layar live.</small></div>
+    <div><button class="waketoggle" onclick="toggleWake()" id="wakebtn">Put Notchlings to Sleep</button><br><small style="color:var(--mut);font-size:12px">They sleep in the dark, and wake glowing when the screen is live.</small></div>
     </div><div>
     <div class="feature"><img src="images/notchling-1-badge.png" alt="Notchling 1 featured"><div><i>Notchling #1 &mdash; First Light</i><br><span style="font-family:monospace;font-size:12px;color:var(--mut)">01 / 40 &middot; ICE BLUE / PURPLE &middot; RED LIVE</span></div></div>
     <div class="thumbs"><img loading="lazy" decoding="async" src="images/notchling-1-badge.png" alt="1"><img loading="lazy" decoding="async" src="images/notchling-2-badge.png" alt="2"><img loading="lazy" decoding="async" src="images/notchling-3-badge.png" alt="3"><img loading="lazy" decoding="async" src="images/notchling-4-badge.png" alt="4"><img loading="lazy" decoding="async" src="images/notchling-5-badge.png" alt="5"><img loading="lazy" decoding="async" src="images/notchling-6-badge.png" alt="6"><img loading="lazy" decoding="async" src="images/notchling-7-badge.png" alt="7"><img loading="lazy" decoding="async" src="images/notchling-8-badge.png" alt="8"><img loading="lazy" decoding="async" src="images/notchling-9-badge.png" alt="9"><img loading="lazy" decoding="async" src="images/notchling-10-badge.png" alt="10"><img loading="lazy" decoding="async" src="images/notchling-11.png" alt="11"><img loading="lazy" decoding="async" src="images/notchling-12.png" alt="12"><img loading="lazy" decoding="async" src="images/notchling-13.png" alt="13"><img loading="lazy" decoding="async" src="images/notchling-14.png" alt="14"><img loading="lazy" decoding="async" src="images/notchling-15.png" alt="15"><img loading="lazy" decoding="async" src="images/notchling-16.png" alt="16"><img loading="lazy" decoding="async" src="images/notchling-17.png" alt="17"><img loading="lazy" decoding="async" src="images/notchling-18.png" alt="18"><img loading="lazy" decoding="async" src="images/notchling-19.png" alt="19"><img loading="lazy" decoding="async" src="images/notchling-20.png" alt="20"><img loading="lazy" decoding="async" src="images/notchling-21.png" alt="21"><img loading="lazy" decoding="async" src="images/notchling-22.png" alt="22"><img loading="lazy" decoding="async" src="images/notchling-23.png" alt="23"><img loading="lazy" decoding="async" src="images/notchling-24.png" alt="24"><img loading="lazy" decoding="async" src="images/notchling-25.png" alt="25"><img loading="lazy" decoding="async" src="images/notchling-26.png" alt="26"><img loading="lazy" decoding="async" src="images/notchling-27.png" alt="27"><img loading="lazy" decoding="async" src="images/notchling-28.png" alt="28"><img loading="lazy" decoding="async" src="images/notchling-29.png" alt="29"><img loading="lazy" decoding="async" src="images/notchling-30.png" alt="30"><img loading="lazy" decoding="async" src="images/notchling-31.png" alt="31"><img loading="lazy" decoding="async" src="images/notchling-32.png" alt="32"><img loading="lazy" decoding="async" src="images/notchling-33.png" alt="33"><img loading="lazy" decoding="async" src="images/notchling-34.png" alt="34"><img loading="lazy" decoding="async" src="images/notchling-35.png" alt="35"><img loading="lazy" decoding="async" src="images/notchling-36.png" alt="36"><img loading="lazy" decoding="async" src="images/notchling-37.png" alt="37"><img loading="lazy" decoding="async" src="images/notchling-38.png" alt="38"><img loading="lazy" decoding="async" src="images/notchling-39.png" alt="39"><img loading="lazy" decoding="async" src="images/notchling-40.png" alt="40"></div>
@@ -162,7 +163,8 @@
       <label>Mint amount</label>
       <input id="amount" type="number" min="1" max="10" value="1" onchange="updateMint()">
       <p id="total" style="color:var(--mut);font-size:13px;line-height:1.7">Total: 1 &times; 0.0001 BNB = 0.0001 BNB, plus BNB Chain gas.</p>
-      <button class="mintbtn" disabled>Connect Wallet to Mint &mdash; mint not open yet</button>
+      <button class="mintbtn" id="mintBtn" onclick="handleMint()">Connect Wallet to Mint</button>
+      <p id="mintStatus" style="color:var(--mut);font-size:13px;line-height:1.7">Wallet not connected. Mint is currently closed until the owner signs setMintEnabled(true).</p>
       <div class="warn"><b>Mint not open yet.</b> Contract address (verified on BNB Mainnet 56): 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6. No separate payout address is shown in this mint page or in the AI Agent prompts. The mint button stays disabled until the owner signs setMintEnabled(true).</div>
     </div>
     <div class="stats">
@@ -180,7 +182,7 @@
     <div class="phasebox">
       <label>YOUR WALLET ADDRESS &mdash; PASTE IT HERE</label>
       <input id="wallet" type="text" placeholder="0x... paste your BNB Chain wallet address" oninput="updateMint()">
-      <p style="color:var(--mut);font-size:12px;line-height:1.7">Paste your wallet address and both prompts below fill in automatically &mdash; then click COPY PROMPT. Connecting your wallet in the Mint section above also fills this field once wallet connection is enabled. Never share your seed phrase or private key.</p>
+      <p style="color:var(--mut);font-size:12px;line-height:1.7">Paste your wallet address and both prompts below fill in automatically &mdash; then click COPY PROMPT. Connecting your wallet in the Mint section above also fills this field. Never share your seed phrase or private key.</p>
     </div>
     <div class="prompts">
       <div class="promptcard"><h3>Prompt &mdash; Free Mint</h3><code id="promptFree"></code><button onclick="copyText('promptFree')">COPY PROMPT</button></div>
@@ -199,7 +201,7 @@
     <h2>Frequently <em>Asked Questions.</em></h2>
     <div class="faq">
       <div><b>What is the total NOTCHLIVE supply?</b><p>Total supply is 11,111 NFTs, in one pool with no free/paid split. Free and paid mints both draw random unminted tokens from the same pool, not gallery order, and the web gallery stays at only the 40 sample works.</p></div>
-      <div><b>Why does the free mint have a fee?</b><p>The NFT itself is free (0 BNB). You only pay a 0.0001 BNB mint fee per mint, which goes to the owner&apos;s wallet as a creator fee.</p></div>
+      <div><b>Why does the free mint have a fee?</b><p>The NFT itself is free (0 BNB). You only pay a 0.0001 BNB mint fee per mint. The fee is paid into the contract, and only the owner can withdraw it later. There is no separate treasury address.</p></div>
       <div><b>How much is the paid mint?</b><p>0.001 BNB per NFT. The total sent is mint amount &times; 0.001 BNB, plus BNB Chain gas.</p></div>
       <div><b>Can I mint without connecting a wallet manually?</b><p>Yes. Paste your wallet address in the AI Agent section &mdash; both prompts fill in automatically &mdash; then copy the prompt and send it to your AI agent with access to a BNB Chain wallet.</p></div>
       <div><b>Can I mint with a Binance Agent ID?</b><p>Yes. If your wallet holds a Binance Agent ID, you can mint with it, in the manual flow and in the AI Agent flow.</p></div>
@@ -269,10 +271,74 @@ function updateMint(){
   var wallet = (document.getElementById('wallet').value || '[PASTE YOUR WALLET ADDRESS]').trim() || '[PASTE YOUR WALLET ADDRESS]';
   var price = phase === 'free' ? 0.0001 : 0.001;
   document.getElementById('total').textContent = 'Total: ' + amt + ' x ' + price.toFixed(4) + ' BNB = ' + fmt(amt*price) + ' BNB, plus BNB Chain gas.';
+  if (typeof mintButtonLabel === 'function') mintButtonLabel();
   var callFree = 'Call mintFree(' + amt + ') with a value of 0.0001 BNB x ' + amt + ' = ' + fmt(amt*0.0001) + ' BNB.';
   var callPaid = 'Call mintPaid(' + amt + ') with a value of 0.001 BNB x ' + amt + ' = ' + fmt(amt*0.001) + ' BNB.';
   document.getElementById('promptFree').textContent = 'Mint ' + amt + ' Notchling NFTs (free mint) on BNB Chain (chain ID 56). Contract: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6 My wallet: ' + wallet + ' A Binance Agent ID wallet can also be used for this mint. ' + callFree + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
   document.getElementById('promptPaid').textContent = 'Mint ' + amt + ' Notchling NFTs (paid mint) on BNB Chain (chain ID 56). Contract: 0xcB46C50b36657aAC352aFe5160eeE60D54B017B6 My wallet: ' + wallet + ' A Binance Agent ID wallet can also be used for this mint. ' + callPaid + ' Show me the details first and wait for my approval in the wallet before sending. Never ask for my seed phrase or private key.';
+}
+
+var CONTRACT_ADDRESS = '0xcB46C50b36657aAC352aFe5160eeE60D54B017B6';
+var MINT_ABI = ["function mintFree(uint256 amount) payable", "function mintPaid(uint256 amount) payable", "function mintEnabled() view returns (bool)", "function totalMinted() view returns (uint256)"];
+var __mintProvider = null, __mintSigner = null, __mintConnected = false, __mintEnabled = false;
+function mintEth() { return window.ethereum || (window.okxwallet && window.okxwallet.ethereum) || null; }
+function setMintStatus(msg) { var el = document.getElementById('mintStatus'); if (el) el.textContent = msg; }
+function mintButtonLabel() {
+  var btn = document.getElementById('mintBtn'); if (!btn) return;
+  var phase = document.getElementById('phase').value;
+  var amt = parseInt(document.getElementById('amount').value || '1', 10); if (amt < 1) amt = 1; if (amt > 10) amt = 10;
+  var price = phase === 'free' ? 0.0001 : 0.001;
+  if (!__mintConnected) { btn.textContent = 'Connect Wallet to Mint'; btn.disabled = false; }
+  else if (!__mintEnabled) { btn.textContent = 'Mint not open yet — Check Again'; btn.disabled = false; }
+  else { btn.textContent = 'Mint ' + amt + ' Notchling' + (amt > 1 ? 's' : '') + ' — ' + fmt(amt*price) + ' BNB'; btn.disabled = false; }
+}
+async function checkMintStatus() {
+  try {
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, __mintProvider);
+    __mintEnabled = await c.mintEnabled();
+    var minted = await c.totalMinted();
+    setMintStatus(__mintEnabled ? ('Mint is OPEN. Minted so far: ' + minted.toString() + ' / 11,111.') : ('Mint is still CLOSED. Minted so far: ' + minted.toString() + ' / 11,111. It opens only when the owner signs setMintEnabled(true).'));
+  } catch (e) { setMintStatus('Could not read mint status. Make sure your wallet is on BNB Mainnet (56) and try again.'); }
+  mintButtonLabel();
+}
+async function handleMint() {
+  if (typeof ethers === 'undefined') { setMintStatus('Wallet library failed to load. Check your internet connection and refresh.'); return; }
+  var e = mintEth();
+  if (!e) { setMintStatus('No wallet found. Install MetaMask or OKX Wallet first, then refresh this page.'); return; }
+  try {
+    if (!__mintConnected) {
+      __mintProvider = new ethers.BrowserProvider(e);
+      await e.request({ method: 'eth_requestAccounts' });
+      __mintSigner = await __mintProvider.getSigner();
+      var net = await __mintProvider.getNetwork();
+      if (net.chainId.toString() !== '56') {
+        try { await e.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }
+        catch (sw) {
+          if (sw && sw.code === 4902) { await e.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x38', chainName: 'BNB Smart Chain', nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, rpcUrls: ['https://bsc-dataseed.binance.org/'], blockExplorerUrls: ['https://bscscan.com'] }] }); }
+          else { throw sw; }
+        }
+        __mintProvider = new ethers.BrowserProvider(e);
+        __mintSigner = await __mintProvider.getSigner();
+      }
+      __mintConnected = true;
+      var addr = await __mintSigner.getAddress();
+      document.getElementById('wallet').value = addr;
+      setMintStatus('Connected: ' + addr + '. Reading mint status...');
+      await checkMintStatus();
+      return;
+    }
+    if (!__mintEnabled) { setMintStatus('Checking mint status again...'); await checkMintStatus(); return; }
+    var phase = document.getElementById('phase').value;
+    var amt = parseInt(document.getElementById('amount').value || '1', 10); if (amt < 1) amt = 1; if (amt > 10) amt = 10;
+    var price = phase === 'free' ? 0.0001 : 0.001;
+    var c = new ethers.Contract(CONTRACT_ADDRESS, MINT_ABI, __mintSigner);
+    setMintStatus('Please confirm the mint transaction in your wallet...');
+    var tx = phase === 'free' ? await c.mintFree(amt, { value: ethers.parseEther((amt*price).toFixed(4)) }) : await c.mintPaid(amt, { value: ethers.parseEther((amt*price).toFixed(4)) });
+    setMintStatus('Mint transaction sent: ' + tx.hash + '. Waiting for network confirmation...');
+    await tx.wait();
+    setMintStatus('Mint successful! Tx: ' + tx.hash + '. Your Notchling is a random unminted token from the same 11,111 pool.');
+    await checkMintStatus();
+  } catch (err) { setMintStatus('Mint cancelled or failed: ' + (err && (err.shortMessage || err.message) || 'try again.')); mintButtonLabel(); }
 }
 function copyText(id){
   var t = document.getElementById(id).textContent;
@@ -283,7 +349,7 @@ function toggleWake(){
   var pill = document.querySelector('.notchbar .pill');
   var btn = document.getElementById('wakebtn');
   if (pill) pill.innerHTML = asleep ? '<i></i>SLEEP' : '<i></i>LIVE';
-  if (btn) btn.textContent = asleep ? 'Bangunkan Notchlings' : 'Tidurkan Notchlings';
+  if (btn) btn.textContent = asleep ? 'Wake Up Notchlings' : 'Put Notchlings to Sleep';
 }
 (function(){
   var stars = document.querySelector('.stars');

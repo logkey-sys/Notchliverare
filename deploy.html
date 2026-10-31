@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOTCHLIVE — Deploy Tinggal Sign</title>
+<title>NOTCHLIVE — Deploy, Just Sign</title>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
 <style>
 body{margin:0;background:#101010;color:#ece7db;font-family:Inter,system-ui,sans-serif;padding:24px;line-height:1.7}
@@ -26,53 +26,53 @@ input,select{width:100%;box-sizing:border-box;background:#000;color:#ece7db;bord
 <body>
 <main>
 <h1>Deploy <em>NOTCHLIVE.</em></h1>
-<p class="mut">Tidak perlu Remix, tidak perlu copy-paste kontrak. Di halaman ini saja: hubungkan wallet owner, pilih jaringan, tekan Deploy, lalu <b>tinggal sign di wallet</b>.</p>
-<p class="warn"><b>Versi Mainnet:</b> deploy ke BNB Mainnet (56) dengan BNB asli. <b>Mint TIDAK langsung dibuka.</b> Di kontrak, <code>mintEnabled = false</code> sejak deploy, jadi tidak ada yang bisa mint sampai wallet owner sendiri menandatangani <code>setMintEnabled(true)</code> di langkah 3 nanti.</p>
+<p class="mut">No Remix, no contract copy-paste. On this page only: connect the owner wallet, pick a network, press Deploy, then <b>just sign in your wallet</b>.</p>
+<p class="warn"><b>Mainnet version:</b> deploy to BNB Mainnet (56) with real BNB. <b>Mint is NOT opened directly.</b> In the contract, <code>mintEnabled = false</code> from deploy, so nobody can mint until the owner wallet itself signs <code>setMintEnabled(true)</code> in step 3 later.</p>
 
 <div class="card">
-<h2>1. Hubungkan wallet owner</h2>
-<p>Wallet yang men-deploy otomatis jadi owner kontrak. Pakai MetaMask atau OKX Wallet.</p>
+<h2>1. Connect the owner wallet</h2>
+<p>The wallet that deploys automatically becomes the contract owner. Use MetaMask or OKX Wallet.</p>
 <button id="connectBtn" onclick="connectWallet()">Connect Wallet Owner</button>
-<p id="walletinfo" class="mut">Wallet belum terhubung.</p>
-<p class="warn"><b>Jangan pernah</b> membagikan seed phrase atau private key ke siapa pun, termasuk ke halaman ini. Halaman ini tidak pernah meminta kunci itu — hanya meminta tanda tangan transaksi di wallet kamu sendiri.</p>
+<p id="walletinfo" class="mut">Wallet not connected yet.</p>
+<p class="warn"><b>Never</b> share your seed phrase or private key with anyone, including this page. This page never asks for those keys — it only asks for a transaction signature in your own wallet.</p>
 </div>
 
 <div class="card">
-<h2>2. Pilih jaringan, lalu Deploy</h2>
-<label for="network">Jaringan</label>
+<h2>2. Pick a network, then Deploy</h2>
+<label for="network">Network</label>
 <select id="network">
-<option value="mainnet" selected>BNB Mainnet (56) — deploy final, pakai BNB asli</option>
-<option value="testnet">BNB Testnet (97) — untuk latihan, pakai tBNB</option>
+<option value="mainnet" selected>BNB Mainnet (56) — final deploy, using real BNB</option>
+<option value="testnet">BNB Testnet (97) — for practice, using tBNB</option>
 </select>
-<p class="mut">Mainnet sudah jadi pilihan utama. Testnet tetap ada kalau mau latihan dulu. Deploy hanya bayar gas, bukan harga mint — dan deploy ini <b>tidak membuka mint</b>.</p>
-<button id="deployBtn" onclick="deployContract()">Deploy Mainnet NOTCHLIVE — Tinggal Sign</button>
+<p class="mut">Mainnet is already the main choice. Testnet is still there if you want to practice first. Deploy only pays gas, not the mint price — and this deploy <b>does not open mint</b>.</p>
+<button id="deployBtn" onclick="deployContract()">Deploy Mainnet NOTCHLIVE — Just Sign</button>
 <p id="deployStatus" class="mut"></p>
 <div id="deployResult" class="result">
-<p class="ok"><b>Kontrak berhasil di-deploy!</b></p>
-<p>Alamat kontrak: <code id="contractAddress"></code> <button onclick="copyAddress()">Salin Alamat</button></p>
-<p>Transaksi deploy: <code id="deployTx"></code></p>
-<p><a id="scanLink" href="#" target="_blank" rel="noopener">Lihat di BscScan</a></p>
-<p>Status mint dari kontrak (dibaca langsung on-chain): <code id="mintStatus">—</code></p>
-<p>Owner kontrak: <code id="ownerAddress">—</code></p>
-<p class="mut">Simpan alamat ini. Setelah alamat ada, masukkan ke halaman mint di notchlive.xyz dan ke prompt AI Agent, menggantikan placeholder yang sekarang. Mint masih tertutup — hanya bisa dibuka lewat sign owner di langkah 3.</p>
+<p class="ok"><b>Contract deployed successfully!</b></p>
+<p>Contract address: <code id="contractAddress"></code> <button onclick="copyAddress()">Copy Address</button></p>
+<p>Deploy transaction: <code id="deployTx"></code></p>
+<p><a id="scanLink" href="#" target="_blank" rel="noopener">View on BscScan</a></p>
+<p>Mint status from the contract (read directly on-chain): <code id="mintStatus">—</code></p>
+<p>Contract owner: <code id="ownerAddress">—</code></p>
+<p class="mut">Save this address. Once you have it, put it on the mint page at notchlive.xyz and in the AI Agent prompts, replacing the current placeholder. Mint is still closed — it can only be opened with the owner signature in step 3.</p>
 </div>
 </div>
 
 <div class="card">
-<h2>3. Setelah deploy: buka mint nanti, juga tinggal sign</h2>
-<p>Urutan yang benar: (1) upload IPFS dulu, (2) owner sign <code>setBaseURI</code>, (3) owner sign <code>setMintEnabled(true)</code>, (4) baru <code>mintFree</code> dan <code>mintPaid</code> bisa dipakai publik.</p>
-<label for="deployedAddress">Alamat kontrak yang sudah di-deploy</label>
-<input id="deployedAddress" placeholder="0x... (terisi otomatis setelah deploy)">
-<label for="baseURI">BaseURI IPFS</label>
-<input id="baseURI" placeholder="ipfs://&lt;CID&gt;/">
-<button class="secondary" onclick="setBaseURI()">Set BaseURI — Sign di Wallet</button>
-<button class="secondary" onclick="setMint(true)">Buka Mint — Sign di Wallet</button>
-<button onclick="setMint(false)">Tutup Mint — Sign di Wallet</button>
-<button class="secondary" onclick="checkDeployedContract()">Cek Kontrak — Baca Saja, Tanpa Sign</button>
+<h2>3. After deploy: open mint later, also just sign</h2>
+<p>Correct order: (1) upload the collection first (GitHub Pages is already live, or IPFS), (2) owner signs <code>setBaseURI</code>, (3) owner signs <code>setMintEnabled(true)</code>, (4) only then can the public use <code>mintFree</code> and <code>mintPaid</code>.</p>
+<label for="deployedAddress">Already-deployed contract address</label>
+<input id="deployedAddress" placeholder="0x... (auto-filled after deploy)">
+<label for="baseURI">BaseURI</label>
+<input id="baseURI" value="https://notchlive.xyz/collection-metadata/">
+<button class="secondary" onclick="setBaseURI()">Set BaseURI — Sign in Wallet</button>
+<button class="secondary" onclick="setMint(true)">Open Mint — Sign in Wallet</button>
+<button onclick="setMint(false)">Close Mint — Sign in Wallet</button>
+<button class="secondary" onclick="checkDeployedContract()">Check Contract — Read Only, No Sign</button>
 <p id="checkResult" class="mut"></p>
 <p id="ownerStatus" class="mut"></p>
-<p class="mut">Harga yang dikunci di kontrak: free mint fee 0.0001 BNB, paid mint 0.001 BNB per NFT, maks 10 per transaksi, total supply 11.111, satu pool tanpa split, tanpa treasury. Dana mint tinggal di kontrak sampai owner withdraw.</p>
-<p class="mut">Masih mau cara lama? <a href="https://remix.ethereum.org/" target="_blank" rel="noopener">Buka Remix</a> dan deploy file <code>NOTCHLIVE.sol</code> dari repo ini.</p>
+<p class="mut">Prices locked in the contract: free mint fee 0.0001 BNB, paid mint 0.001 BNB per NFT, max 10 per transaction, total supply 11,111, one pool with no split, no treasury. Mint funds stay in the contract until the owner withdraws.</p>
+<p class="mut">Still want the old way? <a href="https://remix.ethereum.org/" target="_blank" rel="noopener">Open Remix</a> and deploy the <code>NOTCHLIVE.sol</code> file from this repo.</p>
 </div>
 </main>
 <script>
@@ -90,16 +90,16 @@ function eth() {
 async function connectWallet() {
   const info = document.getElementById("walletinfo");
   const e = eth();
-  if (!e) { info.textContent = "Wallet tidak ditemukan. Instal MetaMask atau OKX Wallet dulu, lalu refresh halaman ini."; return; }
+  if (!e) { info.textContent = "Wallet not found. Install MetaMask or OKX Wallet first, then refresh this page."; return; }
   try {
     provider = new ethers.BrowserProvider(e);
     const accounts = await e.request({ method: "eth_requestAccounts" });
     signer = await provider.getSigner();
     account = accounts[0];
     const net = await provider.getNetwork();
-    info.textContent = "Terhubung: " + account + " | Chain ID: " + net.chainId + ". Pastikan ini wallet owner sebelum deploy.";
+    info.textContent = "Connected: " + account + " | Chain ID: " + net.chainId + ". Make sure this is the owner wallet before deploying.";
   } catch (err) {
-    info.textContent = "Koneksi wallet dibatalkan atau gagal. Coba lagi.";
+    info.textContent = "Wallet connection cancelled or failed. Try again.";
   }
 }
 async function ensureNetwork(key) {
@@ -117,19 +117,19 @@ async function ensureNetwork(key) {
 }
 async function deployContract() {
   const status = document.getElementById("deployStatus");
-  if (typeof ethers === "undefined") { status.textContent = "Library wallet gagal dimuat. Periksa koneksi internet lalu refresh."; return; }
-  if (!signer) { status.textContent = "Hubungkan wallet owner dulu (langkah 1)."; return; }
+  if (typeof ethers === "undefined") { status.textContent = "Wallet library failed to load. Check your internet connection and refresh."; return; }
+  if (!signer) { status.textContent = "Connect the owner wallet first (step 1)."; return; }
   const key = document.getElementById("network").value;
   const net = NETWORKS[key];
   const btn = document.getElementById("deployBtn");
   btn.disabled = true;
   try {
-    status.textContent = "Menyiapkan jaringan " + net.name + "...";
+    status.textContent = "Preparing network " + net.name + "...";
     await ensureNetwork(key);
-    status.textContent = "Silakan sign transaksi deploy di wallet kamu...";
+    status.textContent = "Please sign the deploy transaction in your wallet...";
     const factory = new ethers.ContractFactory(ABI, BYTECODE, signer);
     const contract = await factory.deploy();
-    status.textContent = "Transaksi deploy dikirim: " + contract.deploymentTransaction().hash + ". Menunggu konfirmasi jaringan...";
+    status.textContent = "Deploy transaction sent: " + contract.deploymentTransaction().hash + ". Waiting for network confirmation...";
     await contract.waitForDeployment();
     const address = await contract.getAddress();
     document.getElementById("contractAddress").textContent = address;
@@ -142,14 +142,14 @@ async function deployContract() {
       const check = new ethers.Contract(address, ABI, provider);
       const enabled = await check.mintEnabled();
       const ownerAddr = await check.owner();
-      document.getElementById("mintStatus").textContent = enabled ? "DIBUKA" : "TERTUTUP — menunggu tanda tangan owner";
+      document.getElementById("mintStatus").textContent = enabled ? "OPEN" : "CLOSED — waiting for the owner signature";
       document.getElementById("ownerAddress").textContent = ownerAddr;
     } catch (e) {
-      document.getElementById("mintStatus").textContent = "TERTUTUP (mintEnabled=false di kontrak, dibuka hanya lewat sign owner)";
+      document.getElementById("mintStatus").textContent = "CLOSED (mintEnabled=false in the contract, opened only by owner signature)";
     }
-    status.innerHTML = "<span class='ok'>Selesai di " + net.name + ". Mint TIDAK langsung dibuka — hanya owner yang bisa membukanya lewat sign di langkah 3.</span>";
+    status.innerHTML = "<span class='ok'>Done on " + net.name + ". Mint is NOT opened directly — only the owner can open it with a signature in step 3.</span>";
   } catch (err) {
-    status.textContent = "Deploy dibatalkan atau gagal: " + (err && (err.shortMessage || err.message) ? (err.shortMessage || err.message) : "coba lagi.");
+    status.textContent = "Deploy cancelled or failed: " + (err && (err.shortMessage || err.message) ? (err.shortMessage || err.message) : "try again.");
   } finally { btn.disabled = false; }
 }
 function copyAddress() {
@@ -157,37 +157,37 @@ function copyAddress() {
   if (t) navigator.clipboard.writeText(t);
 }
 async function getOwnerContract() {
-  if (!signer) { document.getElementById("ownerStatus").textContent = "Hubungkan wallet owner dulu (langkah 1)."; return null; }
+  if (!signer) { document.getElementById("ownerStatus").textContent = "Connect the owner wallet first (step 1)."; return null; }
   const address = document.getElementById("deployedAddress").value.trim();
-  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { document.getElementById("ownerStatus").textContent = "Isi alamat kontrak yang valid dulu."; return null; }
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { document.getElementById("ownerStatus").textContent = "Fill in a valid contract address first."; return null; }
   return new ethers.Contract(address, ABI, signer);
 }
 async function setBaseURI() {
   const status = document.getElementById("ownerStatus");
   const uri = document.getElementById("baseURI").value.trim();
-  if (!uri) { status.textContent = "Isi BaseURI IPFS dulu, contoh ipfs://<CID>/"; return; }
+  if (!uri) { status.textContent = "Fill in BaseURI first, e.g. https://notchlive.xyz/collection-metadata/"; return; }
   const c = await getOwnerContract(); if (!c) return;
-  try { status.textContent = "Silakan sign setBaseURI di wallet..."; const tx = await c.setBaseURI(uri); await tx.wait(); status.innerHTML = "<span class='ok'>BaseURI tersimpan. Tx: " + tx.hash + "</span>"; }
-  catch (err) { status.textContent = "Dibatalkan atau gagal: " + (err && (err.shortMessage || err.message) || "coba lagi."); }
+  try { status.textContent = "Please sign setBaseURI in your wallet..."; const tx = await c.setBaseURI(uri); await tx.wait(); status.innerHTML = "<span class='ok'>BaseURI saved. Tx: " + tx.hash + "</span>"; }
+  catch (err) { status.textContent = "Cancelled or failed: " + (err && (err.shortMessage || err.message) || "try again."); }
 }
 async function setMint(enabled) {
   const status = document.getElementById("ownerStatus");
   const c = await getOwnerContract(); if (!c) return;
-  try { status.textContent = "Silakan sign " + (enabled ? "Buka Mint" : "Tutup Mint") + " di wallet..."; const tx = await c.setMintEnabled(enabled); await tx.wait(); status.innerHTML = "<span class='ok'>Mint " + (enabled ? "DIBUKA" : "DITUTUP") + ". Tx: " + tx.hash + "</span>"; }
-  catch (err) { status.textContent = "Dibatalkan atau gagal: " + (err && (err.shortMessage || err.message) || "coba lagi."); }
+  try { status.textContent = "Please sign " + (enabled ? "Open Mint" : "Close Mint") + " in your wallet..."; const tx = await c.setMintEnabled(enabled); await tx.wait(); status.innerHTML = "<span class='ok'>Mint " + (enabled ? "OPEN" : "CLOSED") + ". Tx: " + tx.hash + "</span>"; }
+  catch (err) { status.textContent = "Cancelled or failed: " + (err && (err.shortMessage || err.message) || "try again."); }
 }
 async function checkDeployedContract() {
   const out = document.getElementById("checkResult");
   const address = document.getElementById("deployedAddress").value.trim();
-  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { out.textContent = "Isi alamat kontrak yang valid dulu di langkah 3."; return; }
-  if (!provider) { out.textContent = "Hubungkan wallet dulu (langkah 1). Cek ini hanya baca, tidak meminta sign."; return; }
-  out.textContent = "Membaca kontrak on-chain...";
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) { out.textContent = "Fill in a valid contract address first in step 3."; return; }
+  if (!provider) { out.textContent = "Connect your wallet first (step 1). This check is read-only and asks for no signature."; return; }
+  out.textContent = "Reading the contract on-chain...";
   try {
     const net = await provider.getNetwork();
     const code = await provider.getCode(address);
-    let html = "Chain wallet saat ini: " + net.chainId + (net.chainId.toString() === "56" ? " (BNB Mainnet, benar)" : " (BUKAN 56 — pindah ke BNB Mainnet dulu)") + "<br>";
-    html += "Kode kontrak di chain ini: " + (code === "0x" ? "TIDAK ADA (0x) — alamat ini bukan kontrak di chain ini" : (code.length - 2) / 2 + " byte") + "<br>";
-    if (code === "0x") { out.innerHTML = html + "<b>Berhenti di sini:</b> di chain wallet saat ini tidak ada kontrak di alamat itu. Itulah penyebab umum error 'could not decode result data'. Pindah wallet ke BNB Mainnet 56, hubungkan ulang, lalu tekan Cek Kontrak lagi."; return; }
+    let html = "Current wallet chain: " + net.chainId + (net.chainId.toString() === "56" ? " (BNB Mainnet, correct)" : " (NOT 56 — switch to BNB Mainnet first)") + "<br>";
+    html += "Contract code on this chain: " + (code === "0x" ? "NONE (0x) — this address is not a contract on this chain" : (code.length - 2) / 2 + " bytes") + "<br>";
+    if (code === "0x") { out.innerHTML = html + "<b>Stop here:</b> on the current wallet chain there is no contract at that address. That is a common cause of the 'could not decode result data' error. Switch your wallet to BNB Mainnet 56, reconnect, then press Check Contract again."; return; }
     const c = new ethers.Contract(address, ABI, provider);
     const tests = [["name", () => c.name()], ["symbol", () => c.symbol()], ["owner", () => c.owner()], ["mintEnabled", () => c.mintEnabled()], ["MAX_SUPPLY", () => c.MAX_SUPPLY()], ["totalMinted", () => c.totalMinted()], ["FREE_FEE", () => c.FREE_FEE()], ["PAID_PRICE", () => c.PAID_PRICE()], ["MAX_PER_TX", () => c.MAX_PER_TX()]];
     const vals = {};
@@ -197,10 +197,10 @@ async function checkDeployedContract() {
     }
     const expectedOwner = "0x6828aBa60E9EE9b9E3E3889714102F5954b093A3";
     const match = vals.name === "NOTCHLIVE" && vals.symbol === "NOTCH" && vals.MAX_SUPPLY === "11111" && vals.owner && vals.owner.toLowerCase() === expectedOwner.toLowerCase();
-    html += match ? "<span class='ok'><b>Cocok dengan kontrak NOTCHLIVE yang dikunci.</b> Baru setelah ini alamat boleh dicatat sebagai kontrak resmi dan dimasukkan ke halaman mint.</span>" : "<b>PERINGATAN: belum cocok / ada fungsi yang gagal.</b> Kalau ada fungsi yang GAGAL di atas, kontrak di alamat itu kemungkinan bukan NOTCHLIVE dengan ABI ini, atau wallet masih di chain yang salah. Jangan pakai alamat ini di halaman mint sampai semua fungsi kunci OK.";
+    html += match ? "<span class='ok'><b>Matches the locked NOTCHLIVE contract.</b> Only after this may the address be recorded as the official contract and put on the mint page.</span>" : "<b>WARNING: not yet matching / a function failed.</b> If a function above shows FAILED, the contract at that address is probably not NOTCHLIVE with this ABI, or the wallet is still on the wrong chain. Do not use this address on the mint page until all key functions are OK.";
     out.innerHTML = html;
   } catch (err) {
-    out.textContent = "Gagal membaca kontrak: " + (err && (err.shortMessage || err.message) || "coba lagi.") + " Pastikan wallet di BNB Mainnet 56 dan alamatnya benar.";
+    out.textContent = "Failed to read the contract: " + (err && (err.shortMessage || err.message) || "try again.") + " Make sure your wallet is on BNB Mainnet 56 and the address is correct.";
   }
 }
 </script>
