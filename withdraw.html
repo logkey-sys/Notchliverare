@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>NOTCHLIVE — Withdraw BNB</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.umd.min.js"></script>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--card:#141c31;--line:#263451;--text:#f3f6ff;--muted:#aab6d0;--accent:#f5c84c;--green:#7ee0ad;--red:#ff9090}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#1b2b49 0,var(--bg) 58%);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);display:grid;place-items:center;padding:24px}
+    main{width:min(100%,540px)}.brand{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:750;margin:0 0 10px}.card{background:linear-gradient(160deg,#18233b,var(--card));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,6vw,36px);box-shadow:0 24px 80px #0007}h1{font-size:clamp(27px,7vw,38px);line-height:1.12;margin:0 0 12px}p{color:var(--muted);margin:0 0 18px}.amount{font-size:14px;color:var(--muted);border:1px solid var(--line);background:#0d1426;border-radius:12px;padding:15px;margin:22px 0}.amount strong{display:block;color:var(--text);font-size:22px;margin-top:4px;word-break:break-all}.row{display:flex;gap:12px;flex-wrap:wrap}.btn{appearance:none;border:0;border-radius:12px;padding:13px 18px;font:700 15px system-ui;cursor:pointer;min-height:48px}.primary{background:var(--accent);color:#15120a;flex:1}.secondary{background:#202c46;color:var(--text);border:1px solid var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}.status{margin-top:16px;padding:12px 14px;background:#0d1426;border:1px solid var(--line);border-radius:12px;color:var(--muted);overflow-wrap:anywhere}.status.ok{color:var(--green)}.status.err{color:var(--red)}.detail{font-size:12px;color:var(--muted);margin-top:16px}.detail a{color:#c6d6ff}.warning{font-size:13px;border-left:3px solid var(--accent);padding:8px 12px;margin-top:18px;color:#e8dfc5}.address{font-family:ui-monospace,monospace;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+<main>
+  <p class="brand">NOTCHLIVE · BNB Smart Chain</p>
+  <section class="card" aria-labelledby="title">
+    <h1 id="title">Tarik hasil mint</h1>
+    <p>Halaman ini memanggil fungsi <code>withdraw()</code> pada kontrak NOTCHLIVE. Hanya pemilik kontrak yang dapat menarik saldo.</p>
+    <div class="amount">Saldo BNB di kontrak<strong id="balance">—</strong></div>
+    <div class="amount">Wallet terhubung<strong id="wallet" class="address">Belum terhubung</strong></div>
+    <div class="row">
+      <button class="btn secondary" id="connect">Sambungkan wallet</button>
+      <button class="btn primary" id="withdraw" disabled>Withdraw BNB</button>
+    </div>
+    <div id="status" class="status" role="status" aria-live="polite">Sambungkan wallet pemilik pada jaringan BNB Smart Chain.</div>
+    <div class="warning">Sebelum menyetujui, periksa bahwa wallet menampilkan pemanggilan <code>withdraw</code> untuk alamat kontrak di bawah. Jangan pernah memasukkan seed phrase atau private key.</div>
+    <div class="detail">Kontrak: <span class="address" id="contractText"></span><br>Jaringan: BNB Smart Chain Mainnet (Chain ID 56)<br><a id="explorer" target="_blank" rel="noopener noreferrer">Lihat kontrak di BscScan</a></div>
+  </section>
+</main>
+<script>
+(() => {
+  'use strict';
+  const CONTRACT = '0xcB46C50b36657aAC352aFe5160eeE60D54B017B6';
+  const ABI = ['function owner() view returns (address)', 'function withdraw()'];
+  const CHAIN_ID = 56n;
+  const $ = id => document.getElementById(id);
+  const status = $('status'), connectButton = $('connect'), withdrawButton = $('withdraw');
+  let provider, signer, contract, account;
+  $('contractText').textContent = CONTRACT;
+  $('explorer').href = `https://bscscan.com/address/${CONTRACT}#writeContract`;
+  function message(text, kind='') { status.textContent = text; status.className = `status ${kind}`.trim(); }
+  function short(address) { return `${address.slice(0,6)}…${address.slice(-4)}`; }
+  async function refresh() {
+    if (!provider || !account) return;
+    withdrawButton.disabled = true;
+    const network = await provider.getNetwork();
+    if (network.chainId !== CHAIN_ID) { $('balance').textContent = 'Pilih jaringan BNB Smart Chain'; message('Jaringan salah. Ganti wallet ke BNB Smart Chain Mainnet (Chain ID 56).','err'); return; }
+    const [owner, bal] = await Promise.all([contract.owner(), provider.getBalance(CONTRACT)]);
+    $('balance').textContent = `${ethers.formatEther(bal)} BNB`;
+    const isOwner = owner.toLowerCase() === account.toLowerCase();
+    withdrawButton.disabled = !isOwner || bal === 0n;
+    message(isOwner ? (bal > 0n ? 'Wallet cocok sebagai pemilik kontrak. Periksa saldo lalu tekan Withdraw BNB.' : 'Wallet adalah pemilik, tetapi saldo kontrak saat ini 0 BNB.') : `Wallet ${short(account)} bukan pemilik kontrak (${short(owner)}). Hanya wallet pemilik yang dapat menarik.`, isOwner ? 'ok' : 'err');
+  }
+  connectButton.addEventListener('click', async () => {
+    try {
+      if (!window.ethereum) { message('Wallet EVM seperti MetaMask tidak terdeteksi. Buka halaman ini di browser dengan wallet.','err'); return; }
+      message('Meminta koneksi wallet…');
+      provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      signer = await provider.getSigner(); account = await signer.getAddress();
+      contract = new ethers.Contract(CONTRACT, ABI, signer);
+      $('wallet').textContent = account;
+      await refresh();
+    } catch (e) { message(e.shortMessage || e.message || 'Koneksi wallet gagal atau dibatalkan.','err'); }
+  });
+  withdrawButton.addEventListener('click', async () => {
+    try {
+      withdrawButton.disabled = true;
+      const network = await provider.getNetwork();
+      if (network.chainId !== CHAIN_ID) throw new Error('Jaringan berubah. Pilih BNB Smart Chain Mainnet terlebih dahulu.');
+      const owner = await contract.owner();
+      if (owner.toLowerCase() !== account.toLowerCase()) throw new Error('Wallet ini bukan pemilik kontrak.');
+      message('Periksa detail transaksi di wallet dan setujui hanya jika pemanggilan withdraw() ditujukan ke kontrak yang tertera.');
+      const tx = await contract.withdraw();
+      message(`Transaksi dikirim: ${tx.hash}. Menunggu konfirmasi…`);
+      await tx.wait();
+      message(`Penarikan berhasil. Transaksi: ${tx.hash}`,'ok');
+      await refresh();
+    } catch (e) { message(e.shortMessage || e.message || 'Penarikan dibatalkan atau gagal.','err'); await refresh().catch(()=>{}); }
+  });
+  if (window.ethereum) {
+    window.ethereum.on?.('accountsChanged', async accounts => { if (!accounts.length) { account=null; signer=null; contract=null; $('wallet').textContent='Belum terhubung'; $('balance').textContent='—'; withdrawButton.disabled=true; message('Wallet terputus.'); } else { account=accounts[0]; signer=await provider.getSigner(); contract=new ethers.Contract(CONTRACT,ABI,signer); $('wallet').textContent=account; await refresh().catch(e=>message(e.message,'err')); } });
+    window.ethereum.on?.('chainChanged', () => window.location.reload());
+  }
+})();
+</script>
+</body>
+</html>
